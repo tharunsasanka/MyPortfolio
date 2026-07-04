@@ -1,3 +1,4 @@
+import { AIAssistant } from "@/components/common/AIAssistant";
 import { BackToTopButton } from "@/components/common/BackToTopButton";
 import { CommandPalette } from "@/components/common/CommandPalette";
 import { CyberBackground } from "@/components/common/CyberBackground";
@@ -22,6 +23,7 @@ function App() {
         <FloatingContactButton />
         <BackToTopButton />
         <CommandPalette />
+        <AIAssistant />
       </div>
     </ThemeProvider>
   );
