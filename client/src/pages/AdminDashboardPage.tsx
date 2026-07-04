@@ -1,5 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { HiArrowLeftOnRectangle, HiFolder, HiShieldCheck } from "react-icons/hi2";
+import {
+  HiArrowLeftOnRectangle,
+  HiFolder,
+  HiShieldCheck,
+} from "react-icons/hi2";
+import { ProjectManager } from "@/components/admin/ProjectManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -55,7 +60,7 @@ export function AdminDashboardPage() {
               <HiShieldCheck className="mb-4 text-4xl text-primary" />
               <h2 className="text-xl font-bold">Certificates</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Manage certificates and verification links.
+                Manage certificates and verification links later.
               </p>
             </CardContent>
           </Card>
@@ -65,11 +70,13 @@ export function AdminDashboardPage() {
               <HiShieldCheck className="mb-4 text-4xl text-primary" />
               <h2 className="text-xl font-bold">Cyber Labs</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Update TryHackMe and Hack The Box status.
+                Update TryHackMe and Hack The Box status later.
               </p>
             </CardContent>
           </Card>
         </div>
+
+        <ProjectManager />
       </div>
     </main>
   );
