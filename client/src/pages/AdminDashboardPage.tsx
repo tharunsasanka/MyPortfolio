@@ -7,6 +7,7 @@ import {
 import { CertificateManager } from "@/components/admin/CertificateManager";
 import { CyberLabManager } from "@/components/admin/CyberLabManager";
 import { ProjectManager } from "@/components/admin/ProjectManager";
+import { SkillManager } from "@/components/admin/SkillManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -46,7 +47,7 @@ export function AdminDashboardPage() {
           </Button>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-4">
           <Card className="cyber-card border-border bg-card/70 backdrop-blur-xl">
             <CardContent className="p-6">
               <HiFolder className="mb-4 text-4xl text-primary" />
@@ -76,11 +77,22 @@ export function AdminDashboardPage() {
               </p>
             </CardContent>
           </Card>
+
+          <Card className="cyber-card border-border bg-card/70 backdrop-blur-xl">
+            <CardContent className="p-6">
+              <HiShieldCheck className="mb-4 text-4xl text-primary" />
+              <h2 className="text-xl font-bold">Skills</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Manage technical skills and progress levels.
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         <ProjectManager />
         <CertificateManager />
         <CyberLabManager />
+        <SkillManager />
       </div>
     </main>
   );
