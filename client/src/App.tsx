@@ -1,5 +1,6 @@
 import { CyberBackground } from "@/components/common/CyberBackground";
 import { FloatingContactButton } from "@/components/common/FloatingContactButton";
+import { MouseGlow } from "@/components/common/MouseGlow";
 import { ScrollProgress } from "@/components/common/ScrollProgress";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
@@ -11,6 +12,7 @@ function App() {
     <ThemeProvider>
       <div className="min-h-screen bg-background text-foreground">
         <CyberBackground />
+        <MouseGlow />
         <ScrollProgress />
         <Navbar />
         <AppRoutes />

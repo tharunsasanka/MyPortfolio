@@ -28,7 +28,7 @@ export function CyberLabsSection() {
             viewport={{ once: true }}
             transition={{ delay: index * 0.08, duration: 0.45 }}
           >
-            <Card className="h-full overflow-hidden border-border bg-card/70 backdrop-blur-xl transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_0_35px_rgba(0,229,255,0.12)]">
+            <Card className="h-full overflow-hidden cyber-card border-border bg-card/70 backdrop-blur-xl transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_0_35px_rgba(0,229,255,0.12)]">
               <CardContent className="p-7">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
@@ -113,7 +113,7 @@ export function CyberLabsSection() {
         ))}
       </div>
 
-      <Card className="mt-10 border-border bg-card/70 backdrop-blur-xl">
+      <Card className="mt-10 cyber-card border-border bg-card/70 backdrop-blur-xl">
         <CardContent className="p-7">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>

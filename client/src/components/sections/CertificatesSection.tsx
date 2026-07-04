@@ -28,7 +28,7 @@ export function CertificatesSection() {
             viewport={{ once: true }}
             transition={{ delay: index * 0.06, duration: 0.45 }}
           >
-            <Card className="group h-full overflow-hidden border-border bg-card/70 backdrop-blur-xl transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_0_35px_rgba(0,229,255,0.12)]">
+            <Card className="group h-full overflow-hidden cyber-card border-border bg-card/70 backdrop-blur-xl transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_0_35px_rgba(0,229,255,0.12)]">
               <CardContent className="flex h-full flex-col p-6">
                 <div className="mb-5 flex items-center justify-between gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary transition group-hover:scale-110">

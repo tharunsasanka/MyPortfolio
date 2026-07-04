@@ -27,7 +27,7 @@ export function AboutSection() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.08, duration: 0.5 }}
             >
-              <Card className="h-full border-border bg-card/70 backdrop-blur-xl transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_0_35px_rgba(0,229,255,0.12)]">
+              <Card className="h-full cyber-card border-border bg-card/70 backdrop-blur-xl transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_0_35px_rgba(0,229,255,0.12)]">
                 <CardContent className="p-6">
                   <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                     <Icon className="text-2xl" />
@@ -48,7 +48,7 @@ export function AboutSection() {
       </div>
 
       <div className="mt-16 grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-        <Card className="border-border bg-card/70 backdrop-blur-xl">
+        <Card className="cyber-card border-border bg-card/70 backdrop-blur-xl">
           <CardContent className="p-7">
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">
               Profile
@@ -87,7 +87,7 @@ export function AboutSection() {
               >
                 <span className="absolute left-[9px] top-2 h-4 w-4 rounded-full border-4 border-background bg-primary shadow-[0_0_20px_rgba(0,229,255,0.8)]" />
 
-                <Card className="border-border bg-card/70 backdrop-blur-xl">
+                <Card className="cyber-card border-border bg-card/70 backdrop-blur-xl">
                   <CardContent className="p-6">
                     <p className="text-sm font-semibold text-primary">
                       {item.year}

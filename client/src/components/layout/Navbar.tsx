@@ -43,6 +43,9 @@ export function Navbar() {
             aria-label="Toggle theme"
           >
             {theme === "dark" ? <HiSun /> : <HiMoon />}
+            <span className="transition-transform duration-300 hover:rotate-180">
+  {theme === "dark" ? <HiSun /> : <HiMoon />}
+</span>
           </Button>
 
           <Button className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">

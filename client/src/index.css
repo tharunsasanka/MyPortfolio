@@ -117,3 +117,121 @@ body {
   background: #00e5ff;
   color: #020617;
 }
+.cyber-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(110px);
+  opacity: 0.45;
+  animation: floatOrb 12s ease-in-out infinite alternate;
+}
+
+.cyber-orb-one {
+  left: 50%;
+  top: 5%;
+  width: 520px;
+  height: 520px;
+  transform: translateX(-50%);
+  background: rgba(0, 229, 255, 0.16);
+}
+
+.cyber-orb-two {
+  left: 5%;
+  bottom: 10%;
+  width: 380px;
+  height: 380px;
+  background: rgba(139, 92, 246, 0.16);
+  animation-delay: 2s;
+}
+
+.cyber-orb-three {
+  right: 5%;
+  top: 25%;
+  width: 320px;
+  height: 320px;
+  background: rgba(0, 255, 179, 0.12);
+  animation-delay: 4s;
+}
+
+.cyber-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 229, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.045) 1px, transparent 1px);
+  background-size: 72px 72px;
+  animation: moveGrid 18s linear infinite;
+}
+
+.cyber-scanline {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(0, 229, 255, 0.035),
+    transparent
+  );
+  animation: scanline 8s linear infinite;
+}
+
+.cyber-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    transparent 0%,
+    rgba(5, 8, 22, 0.35) 50%,
+    rgba(5, 8, 22, 0.92) 100%
+  );
+}
+
+.cyber-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    120deg,
+    transparent 20%,
+    rgba(0, 229, 255, 0.12),
+    transparent 80%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.7s ease;
+}
+
+.cyber-card:hover::before {
+  transform: translateX(120%);
+}
+
+@keyframes floatOrb {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(40px, -35px, 0) scale(1.08);
+  }
+}
+
+@keyframes moveGrid {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 72px 72px;
+  }
+}
+
+@keyframes scanline {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}

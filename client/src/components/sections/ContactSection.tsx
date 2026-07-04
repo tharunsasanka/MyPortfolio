@@ -69,7 +69,7 @@ export function ContactSection() {
           transition={{ duration: 0.5 }}
           className="space-y-5"
         >
-          <Card className="border-border bg-card/70 backdrop-blur-xl">
+          <Card className="cyber-card cyber-card border-border bg-card/70 backdrop-blur-xl">
             <CardContent className="p-6">
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                 <HiEnvelope className="text-2xl" />
@@ -86,7 +86,7 @@ export function ContactSection() {
             </CardContent>
           </Card>
 
-          <Card className="border-border bg-card/70 backdrop-blur-xl">
+          <Card className="cyber-card border-border bg-card/70 backdrop-blur-xl">
             <CardContent className="p-6">
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                 <HiMapPin className="text-2xl" />
@@ -98,7 +98,7 @@ export function ContactSection() {
             </CardContent>
           </Card>
 
-          <Card className="border-border bg-card/70 backdrop-blur-xl">
+          <Card className="cyber-card border-border bg-card/70 backdrop-blur-xl">
             <CardContent className="p-6">
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                 <HiPhone className="text-2xl" />
@@ -129,7 +129,7 @@ export function ContactSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <Card className="border-border bg-card/70 backdrop-blur-xl">
+          <Card className="cyber-card border-border bg-card/70 backdrop-blur-xl">
             <CardContent className="p-6 md:p-8">
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid gap-5 md:grid-cols-2">
