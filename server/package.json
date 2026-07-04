@@ -4,13 +4,14 @@
   "description": "Backend API for Cyber Portfolio CMS",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "seed:admin": "tsx src/utils/seedAdmin.ts",
-    "seed:projects": "tsx src/utils/seedProjects.ts",
-    "reset:admin-password": "tsx src/utils/resetAdminPassword.ts"
-  },
+  "dev": "tsx watch src/server.ts",
+  "build": "tsc",
+  "start": "node dist/server.js",
+  "seed:admin": "tsx src/utils/seedAdmin.ts",
+  "seed:projects": "tsx src/utils/seedProjects.ts",
+  "seed:certificates": "tsx src/utils/seedCertificates.ts",
+  "reset:admin-password": "tsx src/utils/resetAdminPassword.ts"
+},
   "keywords": [],
   "author": "Tharun Sasanka",
   "license": "ISC",

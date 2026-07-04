@@ -4,6 +4,7 @@ import {
   HiFolder,
   HiShieldCheck,
 } from "react-icons/hi2";
+import { CertificateManager } from "@/components/admin/CertificateManager";
 import { ProjectManager } from "@/components/admin/ProjectManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -60,7 +61,7 @@ export function AdminDashboardPage() {
               <HiShieldCheck className="mb-4 text-4xl text-primary" />
               <h2 className="text-xl font-bold">Certificates</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Manage certificates and verification links later.
+                Manage certificates and verification links.
               </p>
             </CardContent>
           </Card>
@@ -77,6 +78,7 @@ export function AdminDashboardPage() {
         </div>
 
         <ProjectManager />
+        <CertificateManager />
       </div>
     </main>
   );
