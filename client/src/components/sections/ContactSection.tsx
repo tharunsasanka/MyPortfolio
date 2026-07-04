@@ -1,35 +1,70 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import {
+  HiCheckCircle,
   HiEnvelope,
   HiMapPin,
   HiPaperAirplane,
   HiPhone,
 } from "react-icons/hi2";
-import { motion } from "framer-motion";
-import { SectionHeading } from "@/components/common/SectionHeading";
+import { FaGithub, FaLinkedin, FaWhatsapp } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { profile } from "@/data/profile";
+import { SectionHeading } from "@/components/common/SectionHeading";
+import { sendContactMessage } from "@/services/contactService";
 
-type ContactForm = {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-};
+const contactInfo = [
+  {
+    icon: HiEnvelope,
+    label: "Email",
+    value: "tharunsasanka1234@gmail.com",
+    href: "mailto:tharunsasanka1234@gmail.com",
+  },
+  {
+    icon: HiPhone,
+    label: "Phone",
+    value: "Contact Available",
+    href: "#",
+  },
+  {
+    icon: HiMapPin,
+    label: "Location",
+    value: "Sri Lanka",
+    href: "#",
+  },
+];
 
-const initialForm: ContactForm = {
-  name: "",
-  email: "",
-  subject: "",
-  message: "",
-};
+const socialLinks = [
+  {
+    icon: FaGithub,
+    label: "GitHub",
+    href: "https://github.com/tharunsasanka",
+  },
+  {
+    icon: FaLinkedin,
+    label: "LinkedIn",
+    href: "#",
+  },
+  {
+    icon: FaWhatsapp,
+    label: "WhatsApp",
+    href: "#",
+  },
+];
 
 export function ContactSection() {
-  const [form, setForm] = useState<ContactForm>(initialForm);
-  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  const [sending, setSending] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   function handleChange(
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -42,82 +77,102 @@ export function ContactSection() {
     }));
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setSubmitted(true);
-    setForm(initialForm);
+    setSending(true);
+    setSuccessMessage("");
+    setErrorMessage("");
 
-    setTimeout(() => {
-      setSubmitted(false);
-    }, 4000);
+    try {
+      await sendContactMessage(form);
+
+      setSuccessMessage("Message sent successfully. I will reply soon.");
+      setForm({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+    } catch {
+      setErrorMessage("Message failed to send. Please try again.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
     <section id="contact" className="mx-auto max-w-7xl px-5 py-24">
       <SectionHeading
         eyebrow="Contact"
-        title="Let’s build something secure and modern"
-        description="Have a project idea, collaboration request, or cybersecurity-related opportunity? Send me a message."
+        title="Let's build something secure and modern"
+        description="Have a project, collaboration idea, or cybersecurity-related opportunity? Send me a message directly from this portfolio."
       />
 
-      <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+      <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
         <motion.div
           initial={{ opacity: 0, x: -24 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="space-y-5"
+          transition={{ duration: 0.45 }}
+          className="space-y-6"
         >
-          <Card className="cyber-card cyber-card border-border bg-card/70 backdrop-blur-xl">
-            <CardContent className="p-6">
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <HiEnvelope className="text-2xl" />
+          <Card className="cyber-card border-border bg-card/70 backdrop-blur-xl">
+            <CardContent className="p-7">
+              <h3 className="text-2xl font-black">Contact Details</h3>
+
+              <div className="mt-6 space-y-4">
+                {contactInfo.map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      className="flex items-center gap-4 rounded-2xl border border-border bg-background/60 p-4 transition hover:border-primary/50 hover:bg-primary/5"
+                    >
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                        <Icon className="text-2xl" />
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          {item.label}
+                        </p>
+                        <p className="font-semibold">{item.value}</p>
+                      </div>
+                    </a>
+                  );
+                })}
               </div>
-
-              <h3 className="text-xl font-bold">Email</h3>
-
-              <a
-                href={`mailto:${profile.email}`}
-                className="mt-2 block break-all text-muted-foreground transition hover:text-primary"
-              >
-                {profile.email}
-              </a>
             </CardContent>
           </Card>
 
           <Card className="cyber-card border-border bg-card/70 backdrop-blur-xl">
-            <CardContent className="p-6">
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <HiMapPin className="text-2xl" />
-              </div>
+            <CardContent className="p-7">
+              <h3 className="text-2xl font-black">Social Links</h3>
 
-              <h3 className="text-xl font-bold">Location</h3>
+              <div className="mt-6 flex flex-wrap gap-3">
+                {socialLinks.map((item) => {
+                  const Icon = item.icon;
 
-              <p className="mt-2 text-muted-foreground">{profile.location}</p>
-            </CardContent>
-          </Card>
-
-          <Card className="cyber-card border-border bg-card/70 backdrop-blur-xl">
-            <CardContent className="p-6">
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <HiPhone className="text-2xl" />
-              </div>
-
-              <h3 className="text-xl font-bold">Social Links</h3>
-
-              <div className="mt-4 flex flex-wrap gap-3">
-                {profile.socials.map((social) => (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-full border border-border bg-background/60 px-4 py-2 text-sm text-muted-foreground transition hover:border-primary/50 hover:text-primary"
-                  >
-                    {social.label}
-                  </a>
-                ))}
+                  return (
+                    <Button
+                      key={item.label}
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        if (item.href !== "#") {
+                          window.open(item.href, "_blank");
+                        }
+                      }}
+                      className="rounded-full border-border bg-transparent"
+                    >
+                      <Icon className="mr-2" />
+                      {item.label}
+                    </Button>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -127,29 +182,31 @@ export function ContactSection() {
           initial={{ opacity: 0, x: 24 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.45 }}
         >
           <Card className="cyber-card border-border bg-card/70 backdrop-blur-xl">
-            <CardContent className="p-6 md:p-8">
-              <form onSubmit={handleSubmit} className="space-y-5">
+            <CardContent className="p-7">
+              <h3 className="text-2xl font-black">Send Message</h3>
+
+              <form onSubmit={handleSubmit} className="mt-6 space-y-5">
                 <div className="grid gap-5 md:grid-cols-2">
                   <div>
                     <label className="mb-2 block text-sm text-muted-foreground">
-                      Your Name
+                      Name
                     </label>
                     <Input
                       name="name"
                       value={form.name}
                       onChange={handleChange}
                       required
-                      placeholder="Enter your name"
+                      placeholder="Your name"
                       className="border-border bg-background/60"
                     />
                   </div>
 
                   <div>
                     <label className="mb-2 block text-sm text-muted-foreground">
-                      Your Email
+                      Email
                     </label>
                     <Input
                       type="email"
@@ -157,7 +214,7 @@ export function ContactSection() {
                       value={form.email}
                       onChange={handleChange}
                       required
-                      placeholder="Enter your email"
+                      placeholder="your@email.com"
                       className="border-border bg-background/60"
                     />
                   </div>
@@ -172,7 +229,7 @@ export function ContactSection() {
                     value={form.subject}
                     onChange={handleChange}
                     required
-                    placeholder="Project, collaboration, or question"
+                    placeholder="Project inquiry"
                     className="border-border bg-background/60"
                   />
                 </div>
@@ -186,24 +243,31 @@ export function ContactSection() {
                     value={form.message}
                     onChange={handleChange}
                     required
-                    rows={7}
+                    rows={6}
                     placeholder="Write your message..."
                     className="resize-none border-border bg-background/60"
                   />
                 </div>
 
-                {submitted && (
-                  <div className="rounded-2xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-accent">
-                    Message prepared successfully. Backend message saving will
-                    be connected in the next full-stack phase.
+                {successMessage && (
+                  <div className="flex items-center gap-2 rounded-2xl border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-400">
+                    <HiCheckCircle className="text-xl" />
+                    {successMessage}
+                  </div>
+                )}
+
+                {errorMessage && (
+                  <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+                    {errorMessage}
                   </div>
                 )}
 
                 <Button
                   type="submit"
+                  disabled={sending}
                   className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  Send Message
+                  {sending ? "Sending..." : "Send Message"}
                   <HiPaperAirplane className="ml-2" />
                 </Button>
               </form>
