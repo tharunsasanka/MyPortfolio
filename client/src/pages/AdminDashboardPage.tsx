@@ -5,6 +5,7 @@ import {
   HiShieldCheck,
 } from "react-icons/hi2";
 import { CertificateManager } from "@/components/admin/CertificateManager";
+import { CyberLabManager } from "@/components/admin/CyberLabManager";
 import { ProjectManager } from "@/components/admin/ProjectManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -71,7 +72,7 @@ export function AdminDashboardPage() {
               <HiShieldCheck className="mb-4 text-4xl text-primary" />
               <h2 className="text-xl font-bold">Cyber Labs</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Update TryHackMe and Hack The Box status later.
+                Manage TryHackMe and Hack The Box status.
               </p>
             </CardContent>
           </Card>
@@ -79,6 +80,7 @@ export function AdminDashboardPage() {
 
         <ProjectManager />
         <CertificateManager />
+        <CyberLabManager />
       </div>
     </main>
   );

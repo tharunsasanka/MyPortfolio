@@ -10,6 +10,7 @@
   "seed:admin": "tsx src/utils/seedAdmin.ts",
   "seed:projects": "tsx src/utils/seedProjects.ts",
   "seed:certificates": "tsx src/utils/seedCertificates.ts",
+  "seed:cyber-labs": "tsx src/utils/seedCyberLabs.ts",
   "reset:admin-password": "tsx src/utils/resetAdminPassword.ts"
 },
   "keywords": [],

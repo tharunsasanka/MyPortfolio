@@ -5,6 +5,7 @@ import rateLimit from "express-rate-limit";
 import { env } from "./config/env";
 import authRoutes from "./routes/authRoutes";
 import certificateRoutes from "./routes/certificateRoutes";
+import cyberLabRoutes from "./routes/cyberLabRoutes";
 import projectRoutes from "./routes/projectRoutes";
 
 const app = express();
@@ -47,6 +48,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/certificates", certificateRoutes);
+app.use("/api/cyber-labs", cyberLabRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({
