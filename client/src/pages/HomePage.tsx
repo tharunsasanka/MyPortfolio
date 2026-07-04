@@ -1,5 +1,6 @@
 import { AboutSection } from "@/components/sections/AboutSection";
 import { CertificatesSection } from "@/components/sections/CertificatesSection";
+import { ContactSection } from "@/components/sections/ContactSection";
 import { CyberLabsSection } from "@/components/sections/CyberLabsSection";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
@@ -14,13 +15,7 @@ export function HomePage() {
       <ProjectsSection />
       <CertificatesSection />
       <CyberLabsSection />
-
-      <section id="contact" className="mx-auto max-w-7xl px-5 py-24">
-        <h2 className="text-3xl font-bold">Contact</h2>
-        <p className="mt-4 max-w-2xl text-muted-foreground">
-          Contact form and social links will be added here.
-        </p>
-      </section>
+      <ContactSection />
     </>
   );
 }

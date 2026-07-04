@@ -1,4 +1,5 @@
 import { CyberBackground } from "@/components/common/CyberBackground";
+import { FloatingContactButton } from "@/components/common/FloatingContactButton";
 import { ScrollProgress } from "@/components/common/ScrollProgress";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
@@ -14,6 +15,7 @@ function App() {
         <Navbar />
         <AppRoutes />
         <Footer />
+        <FloatingContactButton />
       </div>
     </ThemeProvider>
   );

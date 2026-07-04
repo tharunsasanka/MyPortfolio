@@ -2,7 +2,7 @@ export const profile = {
   name: "Tharun Sasanka",
   title: "Cybersecurity Student • Ethical Hacker • Full Stack Developer",
   location: "Sri Lanka",
-  email: "your-email@example.com",
+  email: "tharunsasanka1234@gmail.com",
   summary:
     "I build secure, modern, and user-focused digital solutions with a strong interest in cybersecurity, full-stack development, and creative technology.",
 
@@ -29,15 +29,15 @@ export const profile = {
     },
     {
       label: "LinkedIn",
-      href: "https://linkedin.com/in/tharunsasanka",
+      href: "https://www.linkedin.com/in/tharun-sasanka-8280ba2b4/",
     },
     {
       label: "TryHackMe",
-      href: "https://tryhackme.com",
+      href: "https://tryhackme.com/p/tharunsasanka",
     },
     {
       label: "Hack The Box",
-      href: "https://hackthebox.com",
+      href: "https://profile.hackthebox.com/tharunsasanka",
     },
   ],
 };
