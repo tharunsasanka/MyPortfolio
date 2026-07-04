@@ -1,4 +1,5 @@
 import { AboutSection } from "@/components/sections/AboutSection";
+import { CertificatesSection } from "@/components/sections/CertificatesSection";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
 import { SkillsSection } from "@/components/sections/SkillsSection";
@@ -10,13 +11,7 @@ export function HomePage() {
       <AboutSection />
       <SkillsSection />
       <ProjectsSection />
-
-      <section id="certificates" className="mx-auto max-w-7xl px-5 py-24">
-        <h2 className="text-3xl font-bold">Certificates</h2>
-        <p className="mt-4 max-w-2xl text-muted-foreground">
-          Certificate verification cards will be added here.
-        </p>
-      </section>
+      <CertificatesSection />
 
       <section id="cyber-labs" className="mx-auto max-w-7xl px-5 py-24">
         <h2 className="text-3xl font-bold">Cyber Labs</h2>
