@@ -1,31 +1,15 @@
+import { AboutSection } from "@/components/sections/AboutSection";
 import { HeroSection } from "@/components/sections/HeroSection";
+import { ProjectsSection } from "@/components/sections/ProjectsSection";
+import { SkillsSection } from "@/components/sections/SkillsSection";
 
 export function HomePage() {
   return (
     <>
       <HeroSection />
-
-      <section id="about" className="mx-auto max-w-7xl px-5 py-24">
-        <h2 className="text-3xl font-bold">About</h2>
-        <p className="mt-4 max-w-2xl text-muted-foreground">
-          This section will include your biography, education, achievements, and
-          cybersecurity learning journey.
-        </p>
-      </section>
-
-      <section id="skills" className="mx-auto max-w-7xl px-5 py-24">
-        <h2 className="text-3xl font-bold">Skills</h2>
-        <p className="mt-4 max-w-2xl text-muted-foreground">
-          Interactive skills will be added here.
-        </p>
-      </section>
-
-      <section id="projects" className="mx-auto max-w-7xl px-5 py-24">
-        <h2 className="text-3xl font-bold">Projects</h2>
-        <p className="mt-4 max-w-2xl text-muted-foreground">
-          Project cards and preview modals will be added here.
-        </p>
-      </section>
+      <AboutSection />
+      <SkillsSection />
+      <ProjectsSection />
 
       <section id="certificates" className="mx-auto max-w-7xl px-5 py-24">
         <h2 className="text-3xl font-bold">Certificates</h2>
