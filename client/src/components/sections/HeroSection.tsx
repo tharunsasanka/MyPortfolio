@@ -3,6 +3,7 @@ import { HiArrowDownTray, HiArrowRight } from "react-icons/hi2";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { profile } from "@/data/profile";
+import { scrollToSection } from "@/utils/scrollToSection";
 
 export function HeroSection() {
   return (
@@ -36,25 +37,30 @@ export function HeroSection() {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-4">
-            <Button className="rounded-full bg-primary px-7 text-primary-foreground hover:bg-primary/90">
+            <Button
+              type="button"
+              onClick={() => scrollToSection("projects")}
+              className="rounded-full bg-primary px-7 text-primary-foreground hover:bg-primary/90"
+            >
               View Projects
               <HiArrowRight className="ml-2" />
             </Button>
 
-            <Button
-              variant="outline"
-              className="rounded-full border-border bg-transparent px-7"
+            <a
+              href="/cv.pdf"
+              download
+              className="inline-flex items-center justify-center rounded-full border border-border bg-transparent px-7 py-2 text-sm"
             >
               Download CV
               <HiArrowDownTray className="ml-2" />
-            </Button>
+            </a>
           </div>
 
           <div className="mt-10 grid max-w-xl grid-cols-3 gap-4">
             {profile.stats.map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-2xl border border-border bg-card/60 p-4 backdrop-blur"
+                className="cyber-card rounded-2xl border border-border bg-card/60 p-4 backdrop-blur"
               >
                 <p className="text-2xl font-bold text-primary">{stat.value}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -73,7 +79,7 @@ export function HeroSection() {
         >
           <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-r from-primary/30 via-secondary/30 to-accent/30 blur-2xl" />
 
-          <div className="relative rounded-[2rem] border border-border bg-card/70 p-6 shadow-2xl backdrop-blur-xl">
+          <div className="cyber-card relative rounded-[2rem] border border-border bg-card/70 p-6 shadow-2xl backdrop-blur-xl">
             <div className="rounded-[1.5rem] border border-border bg-background/60 p-6">
               <div className="mb-5 flex items-center gap-2">
                 <span className="h-3 w-3 rounded-full bg-red-500" />

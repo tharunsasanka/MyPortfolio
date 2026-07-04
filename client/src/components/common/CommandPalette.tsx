@@ -21,6 +21,7 @@ import { certificates } from "@/data/certificates";
 import { profile } from "@/data/profile";
 import { projects } from "@/data/projects";
 import { skills } from "@/data/skills";
+import { scrollToSection } from "@/utils/scrollToSection";
 
 type CommandAction = {
   label: string;
@@ -30,15 +31,6 @@ type CommandAction = {
   icon: React.ElementType;
 };
 
-function scrollToSection(href: string) {
-  const id = href.replace("#", "");
-  const element = document.getElementById(id);
-
-  if (element) {
-    element.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-}
-
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
 
@@ -47,15 +39,17 @@ export function CommandPalette() {
       const isCommandPalette =
         (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k";
 
-      if (isCommandPalette) {
-        event.preventDefault();
-        setOpen((current) => !current);
-      }
+      if (!isCommandPalette) return;
+
+      event.preventDefault();
+      setOpen((current) => !current);
     }
 
-    window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, true);
 
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown, true);
+    };
   }, []);
 
   const actions = useMemo<CommandAction[]>(() => {
@@ -69,7 +63,7 @@ export function CommandPalette() {
           : link.href === "#contact"
           ? HiEnvelope
           : HiCommandLine,
-      action: () => scrollToSection(link.href),
+      action: () => scrollToSection(link.href.replace("#", "")),
     }));
 
     const projectActions = projects.map((project) => ({
@@ -77,7 +71,7 @@ export function CommandPalette() {
       description: `View project: ${project.category}`,
       group: "Projects",
       icon: HiCodeBracket,
-      action: () => scrollToSection("#projects"),
+      action: () => scrollToSection("projects"),
     }));
 
     const certificateActions = certificates.map((certificate) => ({
@@ -85,7 +79,7 @@ export function CommandPalette() {
       description: `Certificate by ${certificate.issuer}`,
       group: "Certificates",
       icon: HiAcademicCap,
-      action: () => scrollToSection("#certificates"),
+      action: () => scrollToSection("certificates"),
     }));
 
     const skillActions = skills.slice(0, 10).map((skill) => ({
@@ -93,7 +87,7 @@ export function CommandPalette() {
       description: `${skill.category} skill`,
       group: "Skills",
       icon: HiSparkles,
-      action: () => scrollToSection("#skills"),
+      action: () => scrollToSection("skills"),
     }));
 
     const cyberActions = [
@@ -102,14 +96,14 @@ export function CommandPalette() {
         description: "View TryHackMe learning progress",
         group: "Cyber Labs",
         icon: HiShieldCheck,
-        action: () => scrollToSection("#cyber-labs"),
+        action: () => scrollToSection("cyber-labs"),
       },
       {
         label: "Hack The Box Status",
         description: "View Hack The Box learning progress",
         group: "Cyber Labs",
         icon: HiShieldCheck,
-        action: () => scrollToSection("#cyber-labs"),
+        action: () => scrollToSection("cyber-labs"),
       },
     ];
 
@@ -147,7 +141,7 @@ export function CommandPalette() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 left-6 z-50 hidden rounded-full border border-border bg-card/80 px-4 py-3 text-sm text-muted-foreground shadow-lg backdrop-blur-xl transition hover:border-primary/50 hover:text-primary lg:flex"
+        className="fixed bottom-6 left-6 z-[70] hidden rounded-full border border-border bg-card/90 px-4 py-3 text-sm text-muted-foreground shadow-lg backdrop-blur-xl transition hover:border-primary/50 hover:text-primary lg:flex"
       >
         <span className="mr-2 text-primary">⌘</span>
         Search
@@ -158,6 +152,7 @@ export function CommandPalette() {
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Search sections, projects, skills, certificates..." />
+
         <CommandList>
           <CommandEmpty>No result found.</CommandEmpty>
 
@@ -174,6 +169,7 @@ export function CommandPalette() {
                       key={`${item.group}-${item.label}`}
                       value={`${item.label} ${item.description}`}
                       onSelect={() => runAction(item)}
+                      className="cursor-pointer"
                     >
                       <Icon className="mr-2 h-4 w-4 text-primary" />
                       <div>

@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AdminShortcut } from "@/components/common/AdminShortcut";
 import { AdminDashboardPage } from "@/pages/AdminDashboardPage";
 import { AdminLoginPage } from "@/pages/AdminLoginPage";
 import { HomePage } from "@/pages/HomePage";
@@ -7,6 +8,8 @@ import { ProtectedRoute } from "@/routes/ProtectedRoute";
 export function AppRoutes() {
   return (
     <BrowserRouter>
+      <AdminShortcut />
+
       <Routes>
         <Route path="/" element={<HomePage />} />
 

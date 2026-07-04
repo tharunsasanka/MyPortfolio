@@ -8,29 +8,40 @@ import {
 } from "@/components/ui/sheet";
 import { profile } from "@/data/profile";
 import { useTheme } from "@/context/ThemeContext";
+import { scrollToSection } from "@/utils/scrollToSection";
 
 export function Navbar() {
   const { theme, toggleTheme } = useTheme();
 
+  function handleNavClick(href: string) {
+    const id = href.replace("#", "");
+    scrollToSection(id);
+  }
+
   return (
     <header className="fixed left-0 top-0 z-50 w-full border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
-        <a href="#home" className="group flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => scrollToSection("home")}
+          className="group flex items-center gap-2"
+        >
           <span className="h-3 w-3 rounded-full bg-primary shadow-[0_0_20px_rgba(0,229,255,0.9)]" />
           <span className="font-bold tracking-wide">
             THARUN<span className="text-primary">.DEV</span>
           </span>
-        </a>
+        </button>
 
         <div className="hidden items-center gap-6 lg:flex">
           {profile.navLinks.map((link) => (
-            <a
+            <button
               key={link.href}
-              href={link.href}
+              type="button"
+              onClick={() => handleNavClick(link.href)}
               className="text-sm text-muted-foreground transition hover:text-primary"
             >
               {link.label}
-            </a>
+            </button>
           ))}
         </div>
 
@@ -42,13 +53,16 @@ export function Navbar() {
             className="rounded-full bg-transparent"
             aria-label="Toggle theme"
           >
-            {theme === "dark" ? <HiSun /> : <HiMoon />}
             <span className="transition-transform duration-300 hover:rotate-180">
-  {theme === "dark" ? <HiSun /> : <HiMoon />}
-</span>
+              {theme === "dark" ? <HiSun /> : <HiMoon />}
+            </span>
           </Button>
 
-          <Button className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button
+            type="button"
+            onClick={() => scrollToSection("contact")}
+            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+          >
             Let&apos;s Talk
           </Button>
         </div>
@@ -61,7 +75,9 @@ export function Navbar() {
             className="rounded-full bg-transparent"
             aria-label="Toggle theme"
           >
-            {theme === "dark" ? <HiSun /> : <HiMoon />}
+            <span className="transition-transform duration-300 hover:rotate-180">
+              {theme === "dark" ? <HiSun /> : <HiMoon />}
+            </span>
           </Button>
 
           <Sheet>
@@ -75,17 +91,22 @@ export function Navbar() {
               <div className="mt-10 flex flex-col gap-5">
                 {profile.navLinks.map((link) => (
                   <SheetClose key={link.href}>
-                    <a
-                      href={link.href}
-                      className="text-lg text-muted-foreground transition hover:text-primary"
+                    <button
+                      type="button"
+                      onClick={() => handleNavClick(link.href)}
+                      className="text-left text-lg text-muted-foreground transition hover:text-primary"
                     >
                       {link.label}
-                    </a>
+                    </button>
                   </SheetClose>
                 ))}
 
                 <SheetClose>
-                  <Button className="mt-4 rounded-full bg-primary text-primary-foreground">
+                  <Button
+                    type="button"
+                    onClick={() => scrollToSection("contact")}
+                    className="mt-4 rounded-full bg-primary text-primary-foreground"
+                  >
                     Let&apos;s Talk
                   </Button>
                 </SheetClose>
