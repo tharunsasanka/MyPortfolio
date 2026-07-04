@@ -3,6 +3,7 @@ import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { env } from "./config/env";
+import authRoutes from "./routes/authRoutes";
 
 const app = express();
 
@@ -40,6 +41,8 @@ app.get("/api/health", (_req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+app.use("/api/auth", authRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({

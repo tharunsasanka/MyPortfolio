@@ -1,6 +1,13 @@
 import app from "./app";
+import { connectDatabase } from "./config/db";
 import { env } from "./config/env";
 
-app.listen(env.port, () => {
-  console.log(`Server running on http://localhost:${env.port}`);
-});
+async function startServer() {
+  await connectDatabase();
+
+  app.listen(env.port, () => {
+    console.log(`Server running on http://localhost:${env.port}`);
+  });
+}
+
+startServer();
