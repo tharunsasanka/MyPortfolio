@@ -1,3 +1,5 @@
+import { BackToTopButton } from "@/components/common/BackToTopButton";
+import { CommandPalette } from "@/components/common/CommandPalette";
 import { CyberBackground } from "@/components/common/CyberBackground";
 import { FloatingContactButton } from "@/components/common/FloatingContactButton";
 import { MouseGlow } from "@/components/common/MouseGlow";
@@ -18,6 +20,8 @@ function App() {
         <AppRoutes />
         <Footer />
         <FloatingContactButton />
+        <BackToTopButton />
+        <CommandPalette />
       </div>
     </ThemeProvider>
   );
