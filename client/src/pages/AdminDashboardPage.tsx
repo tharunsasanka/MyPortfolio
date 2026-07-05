@@ -5,10 +5,12 @@ import {
   HiEnvelope,
   HiFolder,
   HiShieldCheck,
+  HiUserCircle,
 } from "react-icons/hi2";
 import { CertificateManager } from "@/components/admin/CertificateManager";
 import { ContactInbox } from "@/components/admin/ContactInbox";
 import { CyberLabManager } from "@/components/admin/CyberLabManager";
+import { ProfileManager } from "@/components/admin/ProfileManager";
 import { ProjectManager } from "@/components/admin/ProjectManager";
 import { SkillManager } from "@/components/admin/SkillManager";
 import { Button } from "@/components/ui/button";
@@ -18,7 +20,13 @@ import {
   type DashboardStats,
 } from "@/services/dashboardService";
 
-type AdminTab = "projects" | "certificates" | "cyber-labs" | "skills" | "inbox";
+type AdminTab =
+  | "profile"
+  | "projects"
+  | "certificates"
+  | "cyber-labs"
+  | "skills"
+  | "inbox";
 
 const defaultStats: DashboardStats = {
   projectsCount: 0,
@@ -31,7 +39,7 @@ const defaultStats: DashboardStats = {
 
 export function AdminDashboardPage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<AdminTab>("projects");
+  const [activeTab, setActiveTab] = useState<AdminTab>("profile");
   const [stats, setStats] = useState<DashboardStats>(defaultStats);
 
   const adminUser = localStorage.getItem("admin_user");
@@ -47,11 +55,9 @@ export function AdminDashboardPage() {
   }
 
   useEffect(() => {
-    async function initializeStats() {
+    (async () => {
       await loadStats();
-    }
-
-    void initializeStats();
+    })();
   }, []);
 
   function handleLogout() {
@@ -62,10 +68,18 @@ export function AdminDashboardPage() {
 
   function handleTabChange(tab: AdminTab) {
     setActiveTab(tab);
-    loadStats();
+    void loadStats();
   }
 
   const adminTabs = [
+    {
+      id: "profile" as const,
+      title: "Profile",
+      description: "Edit Hero and About section content.",
+      icon: HiUserCircle,
+      count: 1,
+      countLabel: "Profile",
+    },
     {
       id: "projects" as const,
       title: "Projects",
@@ -111,6 +125,10 @@ export function AdminDashboardPage() {
   ];
 
   function renderActiveSection() {
+    if (activeTab === "profile") {
+      return <ProfileManager />;
+    }
+
     if (activeTab === "projects") {
       return <ProjectManager />;
     }
@@ -131,7 +149,7 @@ export function AdminDashboardPage() {
       return <ContactInbox />;
     }
 
-    return <ProjectManager />;
+    return <ProfileManager />;
   }
 
   return (
@@ -171,7 +189,7 @@ export function AdminDashboardPage() {
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-6">
           {adminTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -186,7 +204,7 @@ export function AdminDashboardPage() {
                 <Card
                   className={`cyber-card h-full border-border backdrop-blur-xl transition hover:-translate-y-1 hover:border-primary/50 ${
                     isActive
-                      ? "bg-primary/10 shadow-[0_0_35px_rgba(0,229,255,0.14)]"
+                      ? "bg-primary/10 shadow-[0_0_35px_rgba(0,255,136,0.14)]"
                       : "bg-card/70"
                   }`}
                 >
