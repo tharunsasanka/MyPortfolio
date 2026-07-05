@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   HiArrowDownTray,
@@ -9,15 +9,67 @@ import {
 } from "react-icons/hi2";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
+import { getProfile, type Profile } from "@/services/profileService";
 import { scrollToSection } from "@/utils/scrollToSection";
 
+const fallbackProfile: Omit<Profile, "_id" | "createdAt" | "updatedAt"> = {
+  name: "Tharun Sasanka",
+  role: "Cybersecurity Student & Full-Stack Developer",
+  badgeText: "Cyber Security",
+  codeText: "<Hello World />",
+  headline: "I'm a",
+  highlightedHeadline: "Cybersecurity Student & Full-Stack Developer",
+  heroDescription:
+    "I am Tharun Sasanka, a cybersecurity student, ethical hacking learner, and developer focused on building secure web applications, digital systems, and cyber-focused projects.",
+
+  githubUrl: "https://github.com/tharunsasanka",
+  linkedinUrl: "#",
+  cvUrl: "/cv.pdf",
+
+  statusText: "Open to Projects",
+  contactText: "Available",
+  learningText: "24/7 Mode",
+  techStackText: "React • Node.js • MongoDB • Cybersecurity",
+
+  projectsStat: "10+",
+  projectsLabel: "Projects",
+  domainsStat: "4+",
+  domainsLabel: "Tech Domains",
+  learningStat: "24/7",
+  learningLabel: "Learning Mode",
+
+  aboutEyebrow: "About Me",
+  aboutTitle: "Cybersecurity learner and full-stack developer",
+  aboutDescription:
+    "I am a cybersecurity student and full-stack developer from Sri Lanka.",
+  aboutSecondDescription:
+    "My goal is to grow as an ethical hacker and developer by building real-world projects.",
+  location: "Sri Lanka",
+  email: "tharunsasanka1234@gmail.com",
+  profileImageUrl: "",
+};
+
 export function HeroSection() {
+  const [profile, setProfile] = useState(fallbackProfile);
   const [cardStyle, setCardStyle] = useState({
     rotateX: "0deg",
     rotateY: "0deg",
     glowX: "50%",
     glowY: "50%",
   });
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const profileData = await getProfile();
+        setProfile(profileData);
+      } catch {
+        setProfile(fallbackProfile);
+      }
+    }
+
+    void loadProfile();
+  }, []);
 
   function handleMouseMove(event: React.MouseEvent<HTMLDivElement>) {
     const card = event.currentTarget;
@@ -47,6 +99,11 @@ export function HeroSection() {
       glowX: "50%",
       glowY: "50%",
     });
+  }
+
+  function openLink(url: string) {
+    if (!url || url === "#") return;
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -111,25 +168,25 @@ export function HeroSection() {
             <div className="hero-reference-main">
               <div className="hero-reference-badge">
                 <HiShieldCheck />
-                Cyber Security
+                {profile.badgeText}
               </div>
 
-              <p className="hero-reference-code">&lt;Hello World /&gt;</p>
+              <p className="hero-reference-code">{profile.codeText}</p>
 
               <h1 className="hero-reference-title hero-reference-title-final">
-                I&apos;m Tharun
-                <span>Sasanka</span>
+                I&apos;m {profile.name.split(" ")[0] || profile.name}
+                <span>
+                  {profile.name.split(" ").slice(1).join(" ") ||
+                    profile.highlightedHeadline}
+                </span>
               </h1>
 
               <h2 className="hero-reference-role hero-reference-role-final">
-                I&apos;m a{" "}
-                <span>Cybersecurity Student & Full-Stack Developer</span>
+                {profile.headline} <span>{profile.highlightedHeadline}</span>
               </h2>
 
               <p className="hero-reference-description hero-reference-description-final">
-                I am Tharun Sasanka, a cybersecurity student, ethical hacking
-                learner, and developer focused on building secure web
-                applications, digital systems, and cyber-focused projects.
+                {profile.heroDescription}
               </p>
 
               <div className="hero-reference-actions hero-reference-actions-final">
@@ -152,7 +209,7 @@ export function HeroSection() {
 
                 <Button
                   type="button"
-                  onClick={() => window.open("/cv.pdf", "_blank")}
+                  onClick={() => openLink(profile.cvUrl)}
                   className="hero-reference-secondary-btn"
                 >
                   <HiArrowDownTray />
@@ -167,9 +224,7 @@ export function HeroSection() {
                   type="button"
                   size="icon"
                   variant="outline"
-                  onClick={() =>
-                    window.open("https://github.com/tharunsasanka", "_blank")
-                  }
+                  onClick={() => openLink(profile.githubUrl)}
                 >
                   <FaGithub />
                 </Button>
@@ -178,7 +233,7 @@ export function HeroSection() {
                   type="button"
                   size="icon"
                   variant="outline"
-                  onClick={() => window.open("#", "_blank")}
+                  onClick={() => openLink(profile.linkedinUrl)}
                 >
                   <FaLinkedin />
                 </Button>
@@ -195,35 +250,35 @@ export function HeroSection() {
 
               <div className="hero-reference-stack">
                 <HiCodeBracket />
-                React • Node.js • MongoDB • Cybersecurity
+                {profile.techStackText}
               </div>
 
               <div className="hero-reference-stats">
                 <div>
-                  <h3>10+</h3>
-                  <p>Projects</p>
+                  <h3>{profile.projectsStat}</h3>
+                  <p>{profile.projectsLabel}</p>
                 </div>
 
                 <div>
-                  <h3>4+</h3>
-                  <p>Tech Domains</p>
+                  <h3>{profile.domainsStat}</h3>
+                  <p>{profile.domainsLabel}</p>
                 </div>
 
                 <div>
-                  <h3>24/7</h3>
-                  <p>Learning Mode</p>
+                  <h3>{profile.learningStat}</h3>
+                  <p>{profile.learningLabel}</p>
                 </div>
               </div>
 
               <div className="hero-reference-info hero-reference-info-final">
                 <div>
                   <p>Status</p>
-                  <h3>Open to Projects</h3>
+                  <h3>{profile.statusText}</h3>
                 </div>
 
                 <div>
                   <p>Contact</p>
-                  <h3>Available</h3>
+                  <h3>{profile.contactText}</h3>
                 </div>
               </div>
             </div>
