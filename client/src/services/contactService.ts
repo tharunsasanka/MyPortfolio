@@ -28,7 +28,10 @@ export async function sendContactMessage(payload: ContactFormData) {
 }
 
 export async function getContactMessages() {
-  const response = await api.get<{ messages: ContactMessage[] }>("/contact");
+  const response = await api.get<{
+    messages: ContactMessage[];
+  }>("/contact");
+
   return response.data.messages;
 }
 
@@ -41,7 +44,19 @@ export async function markContactMessageAsRead(id: string) {
   return response.data;
 }
 
+export async function markContactMessageAsUnread(id: string) {
+  const response = await api.patch<{
+    message: string;
+    contactMessage: ContactMessage;
+  }>(`/contact/${id}/unread`);
+
+  return response.data;
+}
+
 export async function deleteContactMessage(id: string) {
-  const response = await api.delete<{ message: string }>(`/contact/${id}`);
+  const response = await api.delete<{
+    message: string;
+  }>(`/contact/${id}`);
+
   return response.data;
 }

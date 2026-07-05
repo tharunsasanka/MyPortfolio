@@ -4,6 +4,7 @@ import {
   deleteContactMessage,
   getContactMessages,
   markContactMessageAsRead,
+  markContactMessageAsUnread,
 } from "../controllers/contactController";
 import { requireAuth } from "../middlewares/authMiddleware";
 
@@ -13,6 +14,7 @@ router.post("/", createContactMessage);
 
 router.get("/", requireAuth, getContactMessages);
 router.patch("/:id/read", requireAuth, markContactMessageAsRead);
+router.patch("/:id/unread", requireAuth, markContactMessageAsUnread);
 router.delete("/:id", requireAuth, deleteContactMessage);
 
 export default router;

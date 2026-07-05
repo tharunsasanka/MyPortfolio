@@ -6,7 +6,7 @@ export async function createContactMessage(req: Request, res: Response) {
 
   if (!name || !email || !subject || !message) {
     return res.status(400).json({
-      message: "Name, email, subject, and message are required.",
+      message: "Please provide name, email, subject, and message.",
     });
   }
 
@@ -15,16 +15,18 @@ export async function createContactMessage(req: Request, res: Response) {
     email,
     subject,
     message,
+    isRead: false,
   });
 
   return res.status(201).json({
-    message: "Message sent successfully",
+    message: "Message sent successfully.",
     contactMessage,
   });
 }
 
 export async function getContactMessages(_req: Request, res: Response) {
   const messages = await ContactMessage.find().sort({
+    isRead: 1,
     createdAt: -1,
   });
 
@@ -36,7 +38,7 @@ export async function markContactMessageAsRead(req: Request, res: Response) {
 
   if (!message) {
     return res.status(404).json({
-      message: "Contact message not found",
+      message: "Contact message not found.",
     });
   }
 
@@ -44,7 +46,25 @@ export async function markContactMessageAsRead(req: Request, res: Response) {
   await message.save();
 
   return res.json({
-    message: "Message marked as read",
+    message: "Message marked as read.",
+    contactMessage: message,
+  });
+}
+
+export async function markContactMessageAsUnread(req: Request, res: Response) {
+  const message = await ContactMessage.findById(req.params.id);
+
+  if (!message) {
+    return res.status(404).json({
+      message: "Contact message not found.",
+    });
+  }
+
+  message.isRead = false;
+  await message.save();
+
+  return res.json({
+    message: "Message marked as unread.",
     contactMessage: message,
   });
 }
@@ -54,11 +74,11 @@ export async function deleteContactMessage(req: Request, res: Response) {
 
   if (!message) {
     return res.status(404).json({
-      message: "Contact message not found",
+      message: "Contact message not found.",
     });
   }
 
   return res.json({
-    message: "Contact message deleted successfully",
+    message: "Message deleted successfully.",
   });
 }
