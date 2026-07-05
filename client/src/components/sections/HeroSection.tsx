@@ -1,114 +1,242 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { HiArrowDownTray, HiArrowRight } from "react-icons/hi2";
+import {
+  HiArrowDownTray,
+  HiArrowRight,
+  HiCodeBracket,
+  HiEnvelope,
+  HiShieldCheck,
+} from "react-icons/hi2";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { profile } from "@/data/profile";
 import { scrollToSection } from "@/utils/scrollToSection";
 
 export function HeroSection() {
+  const [cardStyle, setCardStyle] = useState({
+    rotateX: "0deg",
+    rotateY: "0deg",
+    glowX: "50%",
+    glowY: "50%",
+  });
+
+  function handleMouseMove(event: React.MouseEvent<HTMLDivElement>) {
+    const card = event.currentTarget;
+    const rect = card.getBoundingClientRect();
+
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    const middleX = rect.width / 2;
+    const middleY = rect.height / 2;
+
+    const rotateY = ((x - middleX) / middleX) * 7;
+    const rotateX = -((y - middleY) / middleY) * 7;
+
+    setCardStyle({
+      rotateX: `${rotateX}deg`,
+      rotateY: `${rotateY}deg`,
+      glowX: `${(x / rect.width) * 100}%`,
+      glowY: `${(y / rect.height) * 100}%`,
+    });
+  }
+
+  function handleMouseLeave() {
+    setCardStyle({
+      rotateX: "0deg",
+      rotateY: "0deg",
+      glowX: "50%",
+      glowY: "50%",
+    });
+  }
+
   return (
     <section
       id="home"
-      className="relative flex min-h-screen items-center px-5 pt-20"
+      className="relative mx-auto flex min-h-[calc(100vh-64px)] max-w-[1500px] items-start justify-center px-5 pb-16 pt-5"
     >
-      <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+      <motion.div
+        initial={{ opacity: 0, y: 22, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.65 }}
+        className="hero-reference-stage hero-reference-stage-wide"
+      >
+        <div className="hero-reference-orbit hero-reference-orbit-one" />
+        <div className="hero-reference-orbit hero-reference-orbit-two" />
+        <div className="hero-reference-orbit hero-reference-orbit-three" />
+
+        <div className="hero-reference-particles">
+          {Array.from({ length: 34 }).map((_, index) => (
+            <span
+              key={index}
+              style={
+                {
+                  "--x": `${(index * 37) % 100}%`,
+                  "--y": `${(index * 53) % 100}%`,
+                  "--delay": `${index * 0.2}s`,
+                  "--duration": `${5 + (index % 6)}s`,
+                } as React.CSSProperties
+              }
+            />
+          ))}
+        </div>
+
+        <div
+          className="hero-reference-card hero-reference-card-final"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={
+            {
+              "--hero-rotate-x": cardStyle.rotateX,
+              "--hero-rotate-y": cardStyle.rotateY,
+              "--hero-glow-x": cardStyle.glowX,
+              "--hero-glow-y": cardStyle.glowY,
+            } as React.CSSProperties
+          }
         >
-          <Badge className="mb-5 border border-primary/30 bg-primary/10 text-primary hover:bg-primary/10">
-            Cybersecurity Portfolio
-          </Badge>
+          <div className="hero-reference-left-glow" />
+          <div className="hero-reference-right-glow" />
+          <div className="hero-cursor-glow" />
+          <div className="hero-card-moving-shine" />
 
-          <h1 className="max-w-4xl text-5xl font-black tracking-tight text-foreground md:text-7xl">
-            Hi, I&apos;m{" "}
-            <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
-              {profile.name}
-            </span>
-          </h1>
-
-          <p className="mt-6 max-w-2xl text-xl text-muted-foreground">
-            {profile.title}
-          </p>
-
-          <p className="mt-5 max-w-2xl leading-8 text-muted-foreground">
-            {profile.summary}
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-4">
-            <Button
-              type="button"
-              onClick={() => scrollToSection("projects")}
-              className="rounded-full bg-primary px-7 text-primary-foreground hover:bg-primary/90"
-            >
-              View Projects
-              <HiArrowRight className="ml-2" />
-            </Button>
-
-            <a
-              href="/cv.pdf"
-              download
-              className="inline-flex items-center justify-center rounded-full border border-border bg-transparent px-7 py-2 text-sm"
-            >
-              Download CV
-              <HiArrowDownTray className="ml-2" />
-            </a>
+          <div className="hero-reference-status">
+            <span />
+            ACTIVE
           </div>
 
-          <div className="mt-10 grid max-w-xl grid-cols-3 gap-4">
-            {profile.stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="cyber-card rounded-2xl border border-border bg-card/60 p-4 backdrop-blur"
-              >
-                <p className="text-2xl font-bold text-primary">{stat.value}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {stat.label}
-                </p>
-              </div>
-            ))}
+          <div className="hero-reference-shield hero-reference-shield-final">
+            <HiShieldCheck />
           </div>
-        </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.7 }}
-          className="relative"
-        >
-          <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-r from-primary/30 via-secondary/30 to-accent/30 blur-2xl" />
-
-          <div className="cyber-card relative rounded-[2rem] border border-border bg-card/70 p-6 shadow-2xl backdrop-blur-xl">
-            <div className="rounded-[1.5rem] border border-border bg-background/60 p-6">
-              <div className="mb-5 flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-red-500" />
-                <span className="h-3 w-3 rounded-full bg-yellow-500" />
-                <span className="h-3 w-3 rounded-full bg-green-500" />
+          <div className="hero-reference-content hero-reference-content-final">
+            <div className="hero-reference-main">
+              <div className="hero-reference-badge">
+                <HiShieldCheck />
+                Cyber Security
               </div>
 
-              <div className="font-mono text-sm leading-8 text-muted-foreground">
-                <p>
-                  <span className="text-primary">$</span> whoami
-                </p>
-                <p className="text-foreground">Tharun Sasanka</p>
+              <p className="hero-reference-code">&lt;Hello World /&gt;</p>
 
-                <p className="mt-4">
-                  <span className="text-primary">$</span> focus --current
-                </p>
-                <p className="text-foreground">
-                  Cybersecurity • Web Development • Ethical Hacking
-                </p>
+              <h1 className="hero-reference-title hero-reference-title-final">
+                I&apos;m Tharun
+                <span>Sasanka</span>
+              </h1>
 
-                <p className="mt-4">
-                  <span className="text-primary">$</span> status
-                </p>
-                <p className="text-accent">Learning. Building. Improving.</p>
+              <h2 className="hero-reference-role hero-reference-role-final">
+                I&apos;m a{" "}
+                <span>Cybersecurity Student & Full-Stack Developer</span>
+              </h2>
+
+              <p className="hero-reference-description hero-reference-description-final">
+                I am Tharun Sasanka, a cybersecurity student, ethical hacking
+                learner, and developer focused on building secure web
+                applications, digital systems, and cyber-focused projects.
+              </p>
+
+              <div className="hero-reference-actions hero-reference-actions-final">
+                <Button
+                  type="button"
+                  onClick={() => scrollToSection("projects")}
+                  className="hero-reference-primary-btn"
+                >
+                  View Projects
+                  <HiArrowRight />
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={() => scrollToSection("contact")}
+                  className="hero-reference-secondary-btn"
+                >
+                  Contact Me
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={() => window.open("/cv.pdf", "_blank")}
+                  className="hero-reference-secondary-btn"
+                >
+                  <HiArrowDownTray />
+                  CV
+                </Button>
+              </div>
+            </div>
+
+            <div className="hero-reference-bottom hero-reference-bottom-final">
+              <div className="hero-reference-socials">
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  onClick={() =>
+                    window.open("https://github.com/tharunsasanka", "_blank")
+                  }
+                >
+                  <FaGithub />
+                </Button>
+
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  onClick={() => window.open("#", "_blank")}
+                >
+                  <FaLinkedin />
+                </Button>
+
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  onClick={() => scrollToSection("contact")}
+                >
+                  <HiEnvelope />
+                </Button>
+              </div>
+
+              <div className="hero-reference-stack">
+                <HiCodeBracket />
+                React • Node.js • MongoDB • Cybersecurity
+              </div>
+
+              <div className="hero-reference-stats">
+                <div>
+                  <h3>10+</h3>
+                  <p>Projects</p>
+                </div>
+
+                <div>
+                  <h3>4+</h3>
+                  <p>Tech Domains</p>
+                </div>
+
+                <div>
+                  <h3>24/7</h3>
+                  <p>Learning Mode</p>
+                </div>
+              </div>
+
+              <div className="hero-reference-info hero-reference-info-final">
+                <div>
+                  <p>Status</p>
+                  <h3>Open to Projects</h3>
+                </div>
+
+                <div>
+                  <p>Contact</p>
+                  <h3>Available</h3>
+                </div>
               </div>
             </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
+
+        <div className="hero-reference-scroll">
+          <div>
+            <span />
+          </div>
+          <p>Scroll Down</p>
+        </div>
+      </motion.div>
     </section>
   );
 }
