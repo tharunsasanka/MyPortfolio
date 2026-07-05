@@ -9,6 +9,7 @@ import cyberLabRoutes from "./routes/cyberLabRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import skillRoutes from "./routes/skillRoutes";
 import contactRoutes from "./routes/contactRoutes";
+import dashboardRoutes from "./routes/dashboardRoutes";
 
 
 const app = express();
@@ -54,6 +55,7 @@ app.use("/api/certificates", certificateRoutes);
 app.use("/api/cyber-labs", cyberLabRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 app.use((_req, res) => {
   res.status(404).json({
     message: "Route not found",
