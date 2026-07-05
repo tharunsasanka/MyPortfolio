@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const contactController_1 = require("../controllers/contactController");
+const authMiddleware_1 = require("../middlewares/authMiddleware");
+const router = (0, express_1.Router)();
+router.post("/", contactController_1.createContactMessage);
+router.get("/", authMiddleware_1.requireAuth, contactController_1.getContactMessages);
+router.patch("/:id/read", authMiddleware_1.requireAuth, contactController_1.markContactMessageAsRead);
+router.patch("/:id/unread", authMiddleware_1.requireAuth, contactController_1.markContactMessageAsUnread);
+router.delete("/:id", authMiddleware_1.requireAuth, contactController_1.deleteContactMessage);
+exports.default = router;

@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const cyberLabController_1 = require("../controllers/cyberLabController");
+const authMiddleware_1 = require("../middlewares/authMiddleware");
+const router = (0, express_1.Router)();
+router.get("/", cyberLabController_1.getCyberLabs);
+router.post("/", authMiddleware_1.requireAuth, cyberLabController_1.createCyberLab);
+router.put("/:id", authMiddleware_1.requireAuth, cyberLabController_1.updateCyberLab);
+router.delete("/:id", authMiddleware_1.requireAuth, cyberLabController_1.deleteCyberLab);
+exports.default = router;
