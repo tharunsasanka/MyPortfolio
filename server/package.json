@@ -12,6 +12,7 @@
   "seed:certificates": "tsx src/utils/seedCertificates.ts",
   "seed:cyber-labs": "tsx src/utils/seedCyberLabs.ts",
   "seed:skills": "tsx src/utils/seedSkills.ts",
+  "seed:profile": "tsx src/utils/seedProfile.ts",
   "reset:admin-password": "tsx src/utils/resetAdminPassword.ts"
 },
   "keywords": [],
