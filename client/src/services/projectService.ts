@@ -10,6 +10,7 @@ export type Project = {
   longDescription: string;
   technologies: string[];
   features: string[];
+  imageUrl: string;
   githubUrl: string;
   liveUrl: string;
   status: ProjectStatus;
@@ -26,6 +27,7 @@ export type ProjectFormData = {
   longDescription: string;
   technologies: string[];
   features: string[];
+  imageUrl: string;
   githubUrl: string;
   liveUrl: string;
   status: ProjectStatus;
@@ -43,24 +45,27 @@ export async function getProjects() {
 }
 
 export async function createProject(payload: ProjectFormData) {
-  const response = await api.post<{ project: Project; message: string }>(
-    "/projects",
-    payload
-  );
+  const response = await api.post<{
+    project: Project;
+    message: string;
+  }>("/projects", payload);
 
   return response.data;
 }
 
 export async function updateProject(id: string, payload: ProjectFormData) {
-  const response = await api.put<{ project: Project; message: string }>(
-    `/projects/${id}`,
-    payload
-  );
+  const response = await api.put<{
+    project: Project;
+    message: string;
+  }>(`/projects/${id}`, payload);
 
   return response.data;
 }
 
 export async function deleteProject(id: string) {
-  const response = await api.delete<{ message: string }>(`/projects/${id}`);
+  const response = await api.delete<{
+    message: string;
+  }>(`/projects/${id}`);
+
   return response.data;
 }

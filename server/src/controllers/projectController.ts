@@ -1,21 +1,25 @@
 import type { Request, Response } from "express";
 import Project from "../models/Project";
 
-function normalizeStringArray(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-
-  return value
-    .filter((item) => typeof item === "string")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
+const allowedFields = [
+  "title",
+  "category",
+  "description",
+  "longDescription",
+  "technologies",
+  "features",
+  "imageUrl",
+  "githubUrl",
+  "liveUrl",
+  "status",
+  "isFeatured",
+  "order",
+] as const;
 
 export async function getProjects(_req: Request, res: Response) {
   const projects = await Project.find().sort({ order: 1, createdAt: -1 });
 
-  return res.json({
-    projects,
-  });
+  return res.json({ projects });
 }
 
 export async function getProjectById(req: Request, res: Response) {
@@ -27,43 +31,23 @@ export async function getProjectById(req: Request, res: Response) {
     });
   }
 
-  return res.json({
-    project,
-  });
+  return res.json({ project });
 }
 
 export async function createProject(req: Request, res: Response) {
-  const {
-    title,
-    category,
-    description,
-    longDescription,
-    githubUrl,
-    liveUrl,
-    status,
-    isFeatured,
-    order,
-  } = req.body;
-
-  if (!title || !category || !description || !longDescription) {
-    return res.status(400).json({
-      message:
-        "Title, category, description, and long description are required.",
-    });
-  }
-
   const project = await Project.create({
-    title,
-    category,
-    description,
-    longDescription,
-    technologies: normalizeStringArray(req.body.technologies),
-    features: normalizeStringArray(req.body.features),
-    githubUrl: githubUrl || "#",
-    liveUrl: liveUrl || "#",
-    status: status || "Planning",
-    isFeatured: Boolean(isFeatured),
-    order: Number(order) || 0,
+    title: req.body.title,
+    category: req.body.category,
+    description: req.body.description,
+    longDescription: req.body.longDescription,
+    technologies: req.body.technologies || [],
+    features: req.body.features || [],
+    imageUrl: req.body.imageUrl || "",
+    githubUrl: req.body.githubUrl || "#",
+    liveUrl: req.body.liveUrl || "#",
+    status: req.body.status || "Completed",
+    isFeatured: req.body.isFeatured || false,
+    order: req.body.order || 0,
   });
 
   return res.status(201).json({
@@ -81,32 +65,12 @@ export async function updateProject(req: Request, res: Response) {
     });
   }
 
-  const allowedFields = [
-    "title",
-    "category",
-    "description",
-    "longDescription",
-    "githubUrl",
-    "liveUrl",
-    "status",
-    "isFeatured",
-    "order",
-  ] as const;
-
   allowedFields.forEach((field) => {
     if (req.body[field] !== undefined) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (project as any)[field] = req.body[field];
     }
   });
-
-  if (req.body.technologies !== undefined) {
-    project.technologies = normalizeStringArray(req.body.technologies);
-  }
-
-  if (req.body.features !== undefined) {
-    project.features = normalizeStringArray(req.body.features);
-  }
 
   await project.save();
 

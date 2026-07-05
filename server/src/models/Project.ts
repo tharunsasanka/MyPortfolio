@@ -6,25 +6,25 @@ const projectSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 120,
+      maxlength: 160,
     },
     category: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 80,
+      maxlength: 120,
     },
     description: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 300,
+      maxlength: 500,
     },
     longDescription: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 2000,
+      maxlength: 1500,
     },
     technologies: {
       type: [String],
@@ -33,6 +33,11 @@ const projectSchema = new Schema(
     features: {
       type: [String],
       default: [],
+    },
+    imageUrl: {
+      type: String,
+      default: "",
+      trim: true,
     },
     githubUrl: {
       type: String,
@@ -47,7 +52,7 @@ const projectSchema = new Schema(
     status: {
       type: String,
       enum: ["Completed", "In Progress", "Planning"],
-      default: "Planning",
+      default: "Completed",
     },
     isFeatured: {
       type: Boolean,

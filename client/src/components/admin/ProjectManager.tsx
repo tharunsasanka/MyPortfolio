@@ -1,15 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-  HiPencilSquare,
-  HiPlus,
-  HiTrash,
-  HiXMark,
-} from "react-icons/hi2";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useState } from "react";
 import {
   createProject,
   deleteProject,
@@ -17,8 +6,9 @@ import {
   updateProject,
   type Project,
   type ProjectFormData,
-  type ProjectStatus,
 } from "@/services/projectService";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 const emptyForm: ProjectFormData = {
   title: "",
@@ -27,449 +17,499 @@ const emptyForm: ProjectFormData = {
   longDescription: "",
   technologies: [],
   features: [],
+  imageUrl: "",
   githubUrl: "#",
   liveUrl: "#",
-  status: "Planning",
-  isFeatured: true,
+  status: "Completed",
+  isFeatured: false,
   order: 0,
 };
 
-function arrayToText(items: string[]) {
-  return items.join(", ");
-}
-
-function textToArray(value: string) {
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
 export function ProjectManager() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [form, setForm] = useState<ProjectFormData>(emptyForm);
+  const [formData, setFormData] = useState<ProjectFormData>(emptyForm);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [technologiesText, setTechnologiesText] = useState("");
   const [featuresText, setFeaturesText] = useState("");
-  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
-  const [showForm, setShowForm] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  const sortedProjects = useMemo(() => {
-    return [...projects].sort((a, b) => a.order - b.order);
-  }, [projects]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState("");
 
   async function loadProjects() {
-    setLoading(true);
-
     try {
+      setIsLoading(true);
       const data = await getProjects();
       setProjects(data);
+    } catch {
+      setMessage("Failed to load projects.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }
 
   useEffect(() => {
-    async function fetchProjects() {
-      setLoading(true);
-
+    let mounted = true;
+    (async () => {
+      if (!mounted) return;
       try {
+        setIsLoading(true);
         const data = await getProjects();
-        setProjects(data);
+        if (mounted) setProjects(data);
+      } catch {
+        if (mounted) setMessage("Failed to load projects.");
       } finally {
-        setLoading(false);
+        if (mounted) setIsLoading(false);
       }
-    }
+    })();
 
-    fetchProjects();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   function resetForm() {
-    setForm(emptyForm);
+    setFormData(emptyForm);
     setTechnologiesText("");
     setFeaturesText("");
     setEditingProjectId(null);
-    setShowForm(false);
   }
 
-  function handleInputChange(
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  function handleChange(
+    event: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) {
     const { name, value } = event.target;
 
-    setForm((currentForm) => ({
-      ...currentForm,
+    setFormData((current) => ({
+      ...current,
       [name]: name === "order" ? Number(value) : value,
     }));
   }
 
-  function handleStatusChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    setForm((currentForm) => ({
-      ...currentForm,
-      status: event.target.value as ProjectStatus,
+  function handleCheckboxChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const { name, checked } = event.target;
+
+    setFormData((current) => ({
+      ...current,
+      [name]: checked,
     }));
   }
 
-  function handleFeaturedChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setForm((currentForm) => ({
-      ...currentForm,
-      isFeatured: event.target.checked,
-    }));
-  }
-
-  function startCreate() {
-    resetForm();
-    setShowForm(true);
-  }
-
-  function startEdit(project: Project) {
+  function handleEdit(project: Project) {
     setEditingProjectId(project._id);
-    setForm({
+
+    setFormData({
       title: project.title,
       category: project.category,
       description: project.description,
       longDescription: project.longDescription,
       technologies: project.technologies,
       features: project.features,
+      imageUrl: project.imageUrl || "",
       githubUrl: project.githubUrl,
       liveUrl: project.liveUrl,
       status: project.status,
       isFeatured: project.isFeatured,
       order: project.order,
     });
-    setTechnologiesText(arrayToText(project.technologies));
-    setFeaturesText(arrayToText(project.features));
-    setShowForm(true);
+
+    setTechnologiesText(project.technologies.join(", "));
+    setFeaturesText(project.features.join(", "));
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const payload: ProjectFormData = {
-      ...form,
-      technologies: textToArray(technologiesText),
-      features: textToArray(featuresText),
-      githubUrl: form.githubUrl || "#",
-      liveUrl: form.liveUrl || "#",
-      order: Number(form.order) || 0,
-    };
-
-    setSaving(true);
-
     try {
+      setIsSaving(true);
+      setMessage("");
+
+      const payload: ProjectFormData = {
+        ...formData,
+        technologies: technologiesText
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean),
+        features: featuresText
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean),
+      };
+
       if (editingProjectId) {
         await updateProject(editingProjectId, payload);
+        setMessage("Project updated successfully.");
       } else {
         await createProject(payload);
+        setMessage("Project created successfully.");
       }
 
-      await loadProjects();
       resetForm();
+      await loadProjects();
+    } catch {
+      setMessage("Failed to save project.");
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   }
 
-  async function handleDelete(project: Project) {
+  async function handleDelete(id: string) {
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${project.title}"?`
+      "Are you sure you want to delete this project?"
     );
 
     if (!confirmed) return;
 
-    await deleteProject(project._id);
-    await loadProjects();
+    try {
+      await deleteProject(id);
+      setMessage("Project deleted successfully.");
+      await loadProjects();
+    } catch {
+      setMessage("Failed to delete project.");
+    }
   }
 
   return (
-    <section className="mt-10">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">
-            Projects CRUD
-          </p>
-          <h2 className="mt-2 text-3xl font-black">Manage Projects</h2>
-          <p className="mt-2 text-muted-foreground">
-            Add, edit, and delete portfolio projects shown on the public site.
+          <h2 className="text-2xl font-black">Projects</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Add, edit, delete, and manage project images.
           </p>
         </div>
 
         <Button
           type="button"
-          onClick={startCreate}
-          className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+          onClick={resetForm}
+          variant="outline"
+          className="rounded-full border-border bg-transparent"
         >
-          <HiPlus className="mr-2" />
-          Add Project
+          New Project
         </Button>
       </div>
 
-      {showForm && (
-        <Card className="cyber-card mb-8 border-border bg-card/80 backdrop-blur-xl">
-          <CardContent className="p-6">
-            <div className="mb-6 flex items-center justify-between gap-4">
-              <h3 className="text-2xl font-bold">
-                {editingProjectId ? "Edit Project" : "Add New Project"}
-              </h3>
+      {message && (
+        <div className="mb-5 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary">
+          {message}
+        </div>
+      )}
 
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={resetForm}
-                className="rounded-full bg-transparent"
-              >
-                <HiXMark />
-              </Button>
+      <Card className="mb-8 border-border bg-card/70">
+        <CardContent className="p-6">
+          <h3 className="text-lg font-black">
+            {editingProjectId ? "Edit Project" : "Create Project"}
+          </h3>
+
+          <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+            <div className="grid gap-5 md:grid-cols-2">
+              <InputField
+                label="Title"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                required
+              />
+
+              <InputField
+                label="Category"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                required
+              />
+
+              <InputField
+                label="Image URL"
+                name="imageUrl"
+                value={formData.imageUrl}
+                onChange={handleChange}
+                placeholder="https://example.com/project-image.jpg"
+              />
+
+              <InputField
+                label="GitHub URL"
+                name="githubUrl"
+                value={formData.githubUrl}
+                onChange={handleChange}
+              />
+
+              <InputField
+                label="Live URL"
+                name="liveUrl"
+                value={formData.liveUrl}
+                onChange={handleChange}
+              />
+
+              <InputField
+                label="Order"
+                name="order"
+                type="number"
+                value={String(formData.order)}
+                onChange={handleChange}
+              />
+
+              <label className="block">
+                <span className="text-sm font-semibold text-muted-foreground">
+                  Status
+                </span>
+
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  className="mt-2 w-full rounded-2xl border border-border bg-background/50 px-4 py-3 text-sm outline-none transition focus:border-primary"
+                >
+                  <option value="Completed">Completed</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Planning">Planning</option>
+                </select>
+              </label>
+
+              <label className="mt-8 flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  name="isFeatured"
+                  checked={formData.isFeatured}
+                  onChange={handleCheckboxChange}
+                  className="h-4 w-4 accent-primary"
+                />
+                <span className="text-sm font-semibold">Featured Project</span>
+              </label>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid gap-5 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">
-                    Title
-                  </label>
-                  <Input
-                    name="title"
-                    value={form.title}
-                    onChange={handleInputChange}
-                    required
-                    className="border-border bg-background/60"
-                  />
-                </div>
+            {formData.imageUrl && (
+              <div className="rounded-3xl border border-border bg-background/40 p-4">
+                <p className="mb-3 text-sm font-semibold text-muted-foreground">
+                  Image Preview
+                </p>
 
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">
-                    Category
-                  </label>
-                  <Input
-                    name="category"
-                    value={form.category}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="Web App, Cybersecurity, Java..."
-                    className="border-border bg-background/60"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm text-muted-foreground">
-                  Short Description
-                </label>
-                <Textarea
-                  name="description"
-                  value={form.description}
-                  onChange={handleInputChange}
-                  required
-                  rows={3}
-                  className="resize-none border-border bg-background/60"
+                <img
+                  src={formData.imageUrl}
+                  alt="Project preview"
+                  className="h-56 w-full rounded-2xl object-cover"
+                  onError={(event) => {
+                    event.currentTarget.style.display = "none";
+                  }}
                 />
               </div>
+            )}
 
-              <div>
-                <label className="mb-2 block text-sm text-muted-foreground">
-                  Long Description
-                </label>
-                <Textarea
-                  name="longDescription"
-                  value={form.longDescription}
-                  onChange={handleInputChange}
-                  required
-                  rows={5}
-                  className="resize-none border-border bg-background/60"
-                />
-              </div>
+            <TextAreaField
+              label="Short Description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              required
+            />
 
-              <div className="grid gap-5 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">
-                    Technologies
-                  </label>
-                  <Input
-                    value={technologiesText}
-                    onChange={(event) =>
-                      setTechnologiesText(event.target.value)
-                    }
-                    placeholder="React, Node.js, MongoDB"
-                    className="border-border bg-background/60"
-                  />
-                </div>
+            <TextAreaField
+              label="Long Description"
+              name="longDescription"
+              value={formData.longDescription}
+              onChange={handleChange}
+              required
+            />
 
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">
-                    Features
-                  </label>
-                  <Input
-                    value={featuresText}
-                    onChange={(event) => setFeaturesText(event.target.value)}
-                    placeholder="CRUD, Auth, Dashboard"
-                    className="border-border bg-background/60"
-                  />
-                </div>
-              </div>
+            <TextAreaField
+              label="Technologies"
+              name="technologies"
+              value={technologiesText}
+              onChange={(event) => setTechnologiesText(event.target.value)}
+              placeholder="React, Node.js, MongoDB"
+            />
 
-              <div className="grid gap-5 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">
-                    GitHub URL
-                  </label>
-                  <Input
-                    name="githubUrl"
-                    value={form.githubUrl}
-                    onChange={handleInputChange}
-                    className="border-border bg-background/60"
-                  />
-                </div>
+            <TextAreaField
+              label="Features"
+              name="features"
+              value={featuresText}
+              onChange={(event) => setFeaturesText(event.target.value)}
+              placeholder="Authentication, Dashboard, CRUD"
+            />
 
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">
-                    Live Demo URL
-                  </label>
-                  <Input
-                    name="liveUrl"
-                    value={form.liveUrl}
-                    onChange={handleInputChange}
-                    className="border-border bg-background/60"
-                  />
-                </div>
-              </div>
-
-              <div className="grid gap-5 md:grid-cols-3">
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">
-                    Status
-                  </label>
-                  <select
-                    value={form.status}
-                    onChange={handleStatusChange}
-                    className="h-10 w-full rounded-md border border-border bg-background/60 px-3 text-sm"
-                  >
-                    <option value="Completed">Completed</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Planning">Planning</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">
-                    Display Order
-                  </label>
-                  <Input
-                    type="number"
-                    name="order"
-                    value={form.order}
-                    onChange={handleInputChange}
-                    className="border-border bg-background/60"
-                  />
-                </div>
-
-                <div className="flex items-end">
-                  <label className="flex h-10 items-center gap-3 rounded-md border border-border bg-background/60 px-4 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={form.isFeatured}
-                      onChange={handleFeaturedChange}
-                    />
-                    Featured
-                  </label>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                <Button
-                  type="submit"
-                  disabled={saving}
-                  className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  {saving
-                    ? "Saving..."
-                    : editingProjectId
-                    ? "Update Project"
-                    : "Create Project"}
-                </Button>
-
+            <div className="flex flex-wrap justify-end gap-3">
+              {editingProjectId && (
                 <Button
                   type="button"
                   variant="outline"
                   onClick={resetForm}
                   className="rounded-full border-border bg-transparent"
                 >
-                  Cancel
+                  Cancel Edit
                 </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+              )}
 
-      {loading ? (
-        <p className="text-muted-foreground">Loading projects...</p>
-      ) : (
-        <div className="grid gap-5">
-          {sortedProjects.map((project) => (
-            <Card
-              key={project._id}
-              className="cyber-card border-border bg-card/70 backdrop-blur-xl"
-            >
-              <CardContent className="flex flex-col gap-5 p-6 lg:flex-row lg:items-center lg:justify-between">
+              <Button type="submit" disabled={isSaving} className="rounded-full">
+                {isSaving
+                  ? "Saving..."
+                  : editingProjectId
+                    ? "Update Project"
+                    : "Create Project"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-6">
+        {isLoading ? (
+          <Card className="border-border bg-card/70">
+            <CardContent className="p-6 text-muted-foreground">
+              Loading projects...
+            </CardContent>
+          </Card>
+        ) : (
+          projects.map((project) => (
+            <Card key={project._id} className="border-border bg-card/70">
+              <CardContent className="grid gap-5 p-6 md:grid-cols-[240px_1fr]">
+                <div className="overflow-hidden rounded-3xl border border-border bg-background/40">
+                  {project.imageUrl ? (
+                    <img
+                      src={project.imageUrl}
+                      alt={project.title}
+                      className="h-44 w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-44 items-center justify-center text-sm text-muted-foreground">
+                      No Image
+                    </div>
+                  )}
+                </div>
+
                 <div>
-                  <div className="mb-3 flex flex-wrap gap-2">
-                    <Badge className="bg-primary text-primary-foreground">
-                      {project.category}
-                    </Badge>
-                    <Badge variant="outline" className="border-border">
-                      {project.status}
-                    </Badge>
-                    <Badge variant="outline" className="border-border">
-                      Order {project.order}
-                    </Badge>
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-xl font-black">{project.title}</h3>
+                      <p className="mt-1 text-sm text-primary">
+                        {project.category} • {project.status}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        onClick={() => handleEdit(project)}
+                        variant="outline"
+                        className="rounded-full border-border bg-transparent"
+                      >
+                        Edit
+                      </Button>
+
+                      <Button
+                        type="button"
+                        onClick={() => handleDelete(project._id)}
+                        variant="outline"
+                        className="rounded-full border-destructive/40 bg-transparent text-destructive hover:bg-destructive/10"
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </div>
 
-                  <h3 className="text-xl font-bold">{project.title}</h3>
-                  <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+                  <p className="mt-4 text-sm leading-7 text-muted-foreground">
                     {project.description}
                   </p>
 
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="mt-4 flex flex-wrap gap-2">
                     {project.technologies.map((tech) => (
                       <span
                         key={tech}
-                        className="rounded-full border border-border bg-background/60 px-3 py-1 text-xs text-muted-foreground"
+                        className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
                       >
                         {tech}
                       </span>
                     ))}
                   </div>
                 </div>
-
-                <div className="flex shrink-0 flex-wrap gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => startEdit(project)}
-                    className="rounded-full border-border bg-transparent"
-                  >
-                    <HiPencilSquare className="mr-2" />
-                    Edit
-                  </Button>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => handleDelete(project)}
-                    className="rounded-full border-destructive/40 bg-transparent text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  >
-                    <HiTrash className="mr-2" />
-                    Delete
-                  </Button>
-                </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
-    </section>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+type InputFieldProps = {
+  label: string;
+  name: string;
+  value: string;
+  type?: string;
+  placeholder?: string;
+  required?: boolean;
+  onChange: (
+    event: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => void;
+};
+
+function InputField({
+  label,
+  name,
+  value,
+  type = "text",
+  placeholder,
+  required,
+  onChange,
+}: InputFieldProps) {
+  return (
+    <label className="block">
+      <span className="text-sm font-semibold text-muted-foreground">
+        {label}
+      </span>
+
+      <input
+        type={type}
+        name={name}
+        value={value}
+        placeholder={placeholder}
+        required={required}
+        onChange={onChange}
+        className="mt-2 w-full rounded-2xl border border-border bg-background/50 px-4 py-3 text-sm outline-none transition placeholder:text-muted-foreground/50 focus:border-primary"
+      />
+    </label>
+  );
+}
+
+type TextAreaFieldProps = {
+  label: string;
+  name: string;
+  value: string;
+  placeholder?: string;
+  required?: boolean;
+  onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+};
+
+function TextAreaField({
+  label,
+  name,
+  value,
+  placeholder,
+  required,
+  onChange,
+}: TextAreaFieldProps) {
+  return (
+    <label className="block">
+      <span className="text-sm font-semibold text-muted-foreground">
+        {label}
+      </span>
+
+      <textarea
+        name={name}
+        value={value}
+        placeholder={placeholder}
+        required={required}
+        rows={4}
+        onChange={onChange}
+        className="mt-2 w-full resize-none rounded-2xl border border-border bg-background/50 px-4 py-3 text-sm leading-7 outline-none transition placeholder:text-muted-foreground/50 focus:border-primary"
+      />
+    </label>
   );
 }

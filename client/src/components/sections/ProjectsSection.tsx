@@ -1,30 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   HiArrowTopRightOnSquare,
   HiCodeBracket,
-  HiEye,
+  HiFolder,
 } from "react-icons/hi2";
-import { Badge } from "@/components/ui/badge";
+import { FaGithub } from "react-icons/fa";
+import { getProjects, type Project } from "@/services/projectService";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { SectionHeading } from "@/components/common/SectionHeading";
-import {
-  getProjects,
-  type Project,
-} from "@/services/projectService";
 
 export function ProjectsSection() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadProjects() {
@@ -34,249 +21,133 @@ export function ProjectsSection() {
       } catch {
         setProjects([]);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     }
 
-    loadProjects();
+    void loadProjects();
   }, []);
 
-  const categories = useMemo(() => {
-    return ["All", ...new Set(projects.map((project) => project.category))];
-  }, [projects]);
-
-  const filteredProjects = useMemo(() => {
-    if (activeCategory === "All") {
-      return projects;
-    }
-
-    return projects.filter((project) => project.category === activeCategory);
-  }, [activeCategory, projects]);
+  function openLink(url: string) {
+    if (!url || url === "#") return;
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
 
   return (
-    <section id="projects" className="mx-auto max-w-7xl px-5 py-24">
-      <SectionHeading
-        eyebrow="Featured Projects"
-        title="Practical work that shows my skills"
-        description="A collection of web, software, cybersecurity, and academic projects that demonstrate my development and problem-solving abilities."
-      />
+    <section id="projects" className="relative px-5 py-24">
+      <div className="mx-auto max-w-7xl">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.55 }}
+          className="mx-auto max-w-3xl text-center"
+        >
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-primary">
+            Projects
+          </p>
 
-      {loading && (
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {[1, 2, 3].map((item) => (
-            <Card
-              key={item}
-              className="border-border bg-card/70 backdrop-blur-xl"
-            >
-              <CardContent className="space-y-4 p-6">
-                <div className="h-6 w-32 animate-pulse rounded-full bg-muted" />
-                <div className="h-8 w-3/4 animate-pulse rounded bg-muted" />
-                <div className="h-20 animate-pulse rounded bg-muted" />
-                <div className="h-10 w-32 animate-pulse rounded-full bg-muted" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+          <h2 className="mt-4 text-4xl font-black tracking-tight md:text-5xl">
+            Featured Work
+          </h2>
 
-      {!loading && projects.length === 0 && (
-        <Card className="mx-auto max-w-2xl border-border bg-card/70 text-center backdrop-blur-xl">
-          <CardContent className="p-8">
-            <HiCodeBracket className="mx-auto mb-4 text-5xl text-primary" />
-            <h3 className="text-2xl font-bold">No projects found yet</h3>
-            <p className="mt-3 text-muted-foreground">
-              Projects will appear here after you add them from the hidden admin
-              dashboard.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+          <p className="mt-6 text-lg leading-8 text-muted-foreground">
+            A selection of cybersecurity, web development, and software projects
+            built with modern technologies.
+          </p>
+        </motion.div>
 
-      {!loading && projects.length > 0 && (
-        <>
-          <div className="mb-10 flex flex-wrap justify-center gap-3">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={activeCategory === category ? "default" : "outline"}
-                onClick={() => setActiveCategory(category)}
-                className={
-                  activeCategory === category
-                    ? "rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
-                    : "rounded-full border-border bg-transparent text-muted-foreground hover:text-foreground"
-                }
-              >
-                {category}
-              </Button>
-            ))}
+        {isLoading ? (
+          <div className="mt-14 rounded-[2rem] border border-border bg-card/60 p-8 text-center text-muted-foreground backdrop-blur-xl">
+            Loading projects...
           </div>
-
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {filteredProjects.map((project, index) => (
-              <motion.div
+        ) : (
+          <div className="mt-14 grid gap-7 lg:grid-cols-2">
+            {projects.map((project, index) => (
+              <motion.article
                 key={project._id}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.05, duration: 0.45 }}
+                transition={{ duration: 0.55, delay: index * 0.08 }}
+                className="cyber-card group overflow-hidden rounded-[2rem] border border-border bg-card/60 backdrop-blur-xl"
               >
-                <Card className="cyber-card group h-full overflow-hidden border-border bg-card/70 backdrop-blur-xl transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_0_35px_rgba(0,229,255,0.12)]">
-                  <CardContent className="flex h-full flex-col p-6">
-                    <div className="mb-5 flex items-center justify-between gap-3">
-                      <Badge className="border border-primary/30 bg-primary/10 text-primary hover:bg-primary/10">
-                        {project.category}
-                      </Badge>
+                <div className="relative h-64 overflow-hidden border-b border-border bg-background/40">
+                  {project.imageUrl ? (
+                    <img
+                      src={project.imageUrl}
+                      alt={project.title}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-3xl border border-primary/30 bg-primary/10">
+                        <HiFolder className="text-5xl text-primary" />
+                      </div>
+                    </div>
+                  )}
 
-                      <Badge variant="outline" className="border-border">
-                        {project.status}
-                      </Badge>
+                  <div className="absolute left-5 top-5 rounded-full border border-primary/30 bg-background/70 px-4 py-2 text-xs font-bold text-primary backdrop-blur-xl">
+                    {project.category}
+                  </div>
+
+                  <div className="absolute right-5 top-5 rounded-full border border-border bg-background/70 px-4 py-2 text-xs font-bold text-foreground backdrop-blur-xl">
+                    {project.status}
+                  </div>
+                </div>
+
+                <div className="p-7">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10">
+                      <HiCodeBracket className="text-3xl text-primary" />
                     </div>
 
-                    <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition group-hover:scale-110">
-                      <HiCodeBracket className="text-3xl" />
+                    <div>
+                      <h3 className="text-2xl font-black">{project.title}</h3>
+
+                      <p className="mt-3 leading-7 text-muted-foreground">
+                        {project.description}
+                      </p>
                     </div>
+                  </div>
 
-                    <h3 className="text-2xl font-bold text-foreground">
-                      {project.title}
-                    </h3>
-
-                    <p className="mt-4 flex-1 leading-7 text-muted-foreground">
-                      {project.description}
-                    </p>
-
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      {project.technologies.slice(0, 4).map((tech) => (
-                        <span
-                          key={tech}
-                          className="rounded-full border border-border bg-background/60 px-3 py-1 text-xs text-muted-foreground"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="mt-7 flex flex-wrap gap-3">
-                      <Button
-                        onClick={() => setSelectedProject(project)}
-                        className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {project.technologies.map((tech) => (
+                      <span
+                        key={tech}
+                        className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
                       >
-                        <HiEye className="mr-2" />
-                        Preview
-                      </Button>
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
 
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          if (project.githubUrl !== "#") {
-                            window.open(project.githubUrl, "_blank");
-                          }
-                        }}
-                        className="rounded-full border-border bg-transparent"
-                      >
-                        GitHub
-                        <HiArrowTopRightOnSquare className="ml-2" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                  <div className="mt-7 flex flex-wrap gap-3">
+                    <Button
+                      type="button"
+                      onClick={() => openLink(project.githubUrl)}
+                      variant="outline"
+                      className="rounded-full border-border bg-transparent"
+                    >
+                      <FaGithub className="mr-2" />
+                      GitHub
+                    </Button>
+
+                    <Button
+                      type="button"
+                      onClick={() => openLink(project.liveUrl)}
+                      className="rounded-full"
+                    >
+                      Live Preview
+                      <HiArrowTopRightOnSquare className="ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              </motion.article>
             ))}
           </div>
-        </>
-      )}
-
-      <Dialog
-        open={selectedProject !== null}
-        onOpenChange={() => setSelectedProject(null)}
-      >
-        <DialogContent className="max-h-[90vh] overflow-y-auto border-border bg-background text-foreground sm:max-w-3xl">
-          {selectedProject && (
-            <>
-              <DialogHeader>
-                <div className="mb-3 flex flex-wrap gap-2">
-                  <Badge className="bg-primary text-primary-foreground">
-                    {selectedProject.category}
-                  </Badge>
-
-                  <Badge variant="outline" className="border-border">
-                    {selectedProject.status}
-                  </Badge>
-                </div>
-
-                <DialogTitle className="text-3xl font-bold">
-                  {selectedProject.title}
-                </DialogTitle>
-              </DialogHeader>
-
-              <p className="mt-4 leading-8 text-muted-foreground">
-                {selectedProject.longDescription}
-              </p>
-
-              <div className="mt-6">
-                <h4 className="mb-3 font-semibold text-foreground">
-                  Key Features
-                </h4>
-
-                <ul className="grid gap-3 md:grid-cols-2">
-                  {selectedProject.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="rounded-2xl border border-border bg-card/70 px-4 py-3 text-sm text-muted-foreground"
-                    >
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="mt-6">
-                <h4 className="mb-3 font-semibold text-foreground">
-                  Technologies
-                </h4>
-
-                <div className="flex flex-wrap gap-2">
-                  {selectedProject.technologies.map((tech) => (
-                    <Badge
-                      key={tech}
-                      variant="outline"
-                      className="border-border text-muted-foreground"
-                    >
-                      {tech}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Button
-                  onClick={() => {
-                    if (selectedProject.githubUrl !== "#") {
-                      window.open(selectedProject.githubUrl, "_blank");
-                    }
-                  }}
-                  className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  GitHub Repository
-                  <HiArrowTopRightOnSquare className="ml-2" />
-                </Button>
-
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    if (selectedProject.liveUrl !== "#") {
-                      window.open(selectedProject.liveUrl, "_blank");
-                    }
-                  }}
-                  className="rounded-full border-border bg-transparent"
-                >
-                  Live Demo
-                  <HiArrowTopRightOnSquare className="ml-2" />
-                </Button>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+        )}
+      </div>
     </section>
   );
 }
