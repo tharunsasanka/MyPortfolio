@@ -26,12 +26,12 @@ const contactInfo = [
     icon: HiPhone,
     label: "Phone",
     value: "Contact Available",
-    href: "#",
+    href: "tel:+94715631787",
   },
   {
     icon: HiMapPin,
     label: "Location",
-    value: "Sri Lanka",
+    value: "Horana, Sri Lanka",
     href: "#",
   },
 ];
@@ -45,12 +45,12 @@ const socialLinks = [
   {
     icon: FaLinkedin,
     label: "LinkedIn",
-    href: "#",
+    href: "https://www.linkedin.com/in/tharun-sasanka-8280ba2b4/",
   },
   {
     icon: FaWhatsapp,
     label: "WhatsApp",
-    href: "#",
+    href: "https://wa.me/94715631787",
   },
 ];
 

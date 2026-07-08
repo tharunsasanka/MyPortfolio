@@ -42,7 +42,7 @@ const fallbackProfile: Omit<Profile, "_id" | "createdAt" | "updatedAt"> = {
   aboutSecondDescription:
     "My goal is to grow as an ethical hacker and developer by building real-world projects, improving my technical skills, and creating secure systems that solve practical problems.",
 
-  location: "Sri Lanka",
+  location: "Horana, Sri Lanka",
   email: "tharunsasanka1234@gmail.com",
   profileImageUrl: "",
 };

@@ -10,6 +10,7 @@ import dashboardRoutes from "./routes/dashboardRoutes";
 import profileRoutes from "./routes/profileRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import skillRoutes from "./routes/skillRoutes";
+import cvRoutes from "./routes/cvRoutes";
 import { env } from "./config/env";
 
 const app = express();
@@ -94,6 +95,7 @@ app.use("/api/skills", skillRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/cv", cvRoutes);
 
 app.use((_req, res) => {
   return res.status(404).json({
