@@ -15,6 +15,7 @@ const dashboardRoutes_1 = __importDefault(require("./routes/dashboardRoutes"));
 const profileRoutes_1 = __importDefault(require("./routes/profileRoutes"));
 const projectRoutes_1 = __importDefault(require("./routes/projectRoutes"));
 const skillRoutes_1 = __importDefault(require("./routes/skillRoutes"));
+const cvRoutes_1 = __importDefault(require("./routes/cvRoutes"));
 const env_1 = require("./config/env");
 const app = (0, express_1.default)();
 const allowedOrigins = [
@@ -78,6 +79,7 @@ app.use("/api/skills", skillRoutes_1.default);
 app.use("/api/contact", contactRoutes_1.default);
 app.use("/api/dashboard", dashboardRoutes_1.default);
 app.use("/api/profile", profileRoutes_1.default);
+app.use("/api/cv", cvRoutes_1.default);
 app.use((_req, res) => {
     return res.status(404).json({
         message: "Route not found",

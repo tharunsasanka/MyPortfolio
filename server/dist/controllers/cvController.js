@@ -1,0 +1,293 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.downloadCv = downloadCv;
+const PDFDocument = require("pdfkit");
+const Certificate_1 = __importDefault(require("../models/Certificate"));
+const CyberLab_1 = __importDefault(require("../models/CyberLab"));
+const Profile_1 = __importDefault(require("../models/Profile"));
+const Project_1 = __importDefault(require("../models/Project"));
+const Skill_1 = __importDefault(require("../models/Skill"));
+function getText(value, fallback = "") {
+    if (typeof value !== "string")
+        return fallback;
+    return value.trim() || fallback;
+}
+function getStringList(value) {
+    if (Array.isArray(value)) {
+        return value
+            .map((item) => String(item).trim())
+            .filter(Boolean);
+    }
+    if (typeof value === "string") {
+        return value
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+    return [];
+}
+function formatDate(value) {
+    if (!value)
+        return "";
+    const date = new Date(String(value));
+    if (Number.isNaN(date.getTime())) {
+        return String(value);
+    }
+    return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+    });
+}
+function safeFileName(name) {
+    return name.replace(/[^a-z0-9]/gi, "_").replace(/_+/g, "_");
+}
+function addPageIfNeeded(doc, neededSpace = 90) {
+    const bottomMargin = 60;
+    if (doc.y + neededSpace > doc.page.height - bottomMargin) {
+        doc.addPage();
+    }
+}
+function addSectionTitle(doc, title) {
+    addPageIfNeeded(doc, 80);
+    doc.moveDown(0.9);
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .fillColor("#111827")
+        .text(title.toUpperCase(), {
+        continued: false,
+    });
+    doc
+        .moveTo(50, doc.y + 4)
+        .lineTo(545, doc.y + 4)
+        .strokeColor("#d1d5db")
+        .lineWidth(1)
+        .stroke();
+    doc.moveDown(0.8);
+}
+function addBullet(doc, text) {
+    addPageIfNeeded(doc, 45);
+    doc
+        .font("Helvetica")
+        .fontSize(10)
+        .fillColor("#111827")
+        .text(`• ${text}`, {
+        width: 495,
+        lineGap: 2,
+    });
+}
+function addParagraph(doc, text) {
+    if (!text)
+        return;
+    addPageIfNeeded(doc, 70);
+    doc
+        .font("Helvetica")
+        .fontSize(10.5)
+        .fillColor("#111827")
+        .text(text, {
+        width: 495,
+        lineGap: 3,
+    });
+}
+function addItemTitle(doc, title, meta) {
+    addPageIfNeeded(doc, 60);
+    doc.font("Helvetica-Bold").fontSize(10.8).fillColor("#111827").text(title, {
+        continued: Boolean(meta),
+    });
+    if (meta) {
+        doc
+            .font("Helvetica")
+            .fontSize(10)
+            .fillColor("#4b5563")
+            .text(`  |  ${meta}`);
+    }
+}
+async function downloadCv(_req, res) {
+    try {
+        const [profile, projects, skills, certificates, cyberLabs] = await Promise.all([
+            Profile_1.default.findOne().sort({ updatedAt: -1 }).lean(),
+            Project_1.default.find().sort({ createdAt: -1 }).lean(),
+            Skill_1.default.find().sort({ category: 1, level: -1 }).lean(),
+            Certificate_1.default.find().sort({ createdAt: -1 }).lean(),
+            CyberLab_1.default.find().sort({ createdAt: -1 }).lean(),
+        ]);
+        const name = getText(profile?.name, "Tharun Sasanka");
+        const role = getText(profile?.role, "Cybersecurity Student and Full-Stack Developer");
+        const email = getText(profile?.email);
+        const location = getText(profile?.location);
+        const githubUrl = getText(profile?.githubUrl);
+        const linkedinUrl = getText(profile?.linkedinUrl);
+        const summary = getText(profile?.heroDescription) ||
+            getText(profile?.aboutDescription) ||
+            "Cybersecurity-focused technology learner with practical experience in secure web development, backend systems, databases, and hands-on security projects.";
+        const secondSummary = getText(profile?.aboutSecondDescription);
+        const techStackText = getText(profile?.techStackText);
+        const learningText = getText(profile?.learningText);
+        const fileName = `${safeFileName(name)}_ATS_CV.pdf`;
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+        const doc = new PDFDocument({
+            size: "A4",
+            margin: 50,
+            info: {
+                Title: `${name} - ATS CV`,
+                Author: name,
+                Subject: "ATS-friendly curriculum vitae generated from portfolio data",
+            },
+        });
+        doc.pipe(res);
+        // Header
+        doc.font("Helvetica-Bold").fontSize(22).fillColor("#111827").text(name);
+        doc.moveDown(0.25);
+        doc.font("Helvetica").fontSize(11.5).fillColor("#374151").text(role);
+        const contactItems = [location, email, githubUrl, linkedinUrl].filter(Boolean);
+        if (contactItems.length > 0) {
+            doc.moveDown(0.4);
+            doc
+                .font("Helvetica")
+                .fontSize(9.5)
+                .fillColor("#374151")
+                .text(contactItems.join(" | "), {
+                width: 495,
+                lineGap: 2,
+            });
+        }
+        doc.moveDown(0.8);
+        // Summary
+        addSectionTitle(doc, "Professional Summary");
+        addParagraph(doc, summary);
+        if (secondSummary) {
+            addParagraph(doc, secondSummary);
+        }
+        if (learningText) {
+            addBullet(doc, learningText);
+        }
+        if (techStackText) {
+            addBullet(doc, `Technology focus: ${techStackText}`);
+        }
+        // Skills
+        if (skills.length > 0) {
+            addSectionTitle(doc, "Technical Skills");
+            const groupedSkills = skills.reduce((acc, skill) => {
+                const category = getText(skill.category, "General");
+                const skillName = getText(skill.name);
+                if (!skillName)
+                    return acc;
+                if (!acc[category]) {
+                    acc[category] = [];
+                }
+                acc[category].push(skillName);
+                return acc;
+            }, {});
+            Object.entries(groupedSkills).forEach(([category, names]) => {
+                addPageIfNeeded(doc, 45);
+                doc
+                    .font("Helvetica-Bold")
+                    .fontSize(10.5)
+                    .fillColor("#111827")
+                    .text(`${category}: `, {
+                    continued: true,
+                });
+                doc
+                    .font("Helvetica")
+                    .fontSize(10.5)
+                    .fillColor("#111827")
+                    .text(names.join(", "), {
+                    width: 430,
+                    lineGap: 2,
+                });
+            });
+        }
+        // Projects
+        if (projects.length > 0) {
+            addSectionTitle(doc, "Selected Projects");
+            projects.slice(0, 8).forEach((project) => {
+                const title = getText(project.title, "Untitled Project");
+                const category = getText(project.category);
+                const description = getText(project.description);
+                const technologies = getStringList(project.technologies);
+                const github = getText(project.githubUrl);
+                const live = getText(project.liveUrl);
+                addItemTitle(doc, title, category);
+                if (description) {
+                    addBullet(doc, description);
+                }
+                if (technologies.length > 0) {
+                    addBullet(doc, `Technologies: ${technologies.join(", ")}`);
+                }
+                if (github) {
+                    addBullet(doc, `GitHub: ${github}`);
+                }
+                if (live) {
+                    addBullet(doc, `Live Demo: ${live}`);
+                }
+                doc.moveDown(0.4);
+            });
+        }
+        // Certificates
+        if (certificates.length > 0) {
+            addSectionTitle(doc, "Certificates");
+            certificates.slice(0, 10).forEach((certificate) => {
+                const title = getText(certificate.title, "Certificate");
+                const issuer = getText(certificate.issuer);
+                const issuedDate = formatDate(certificate.issuedDate) ||
+                    formatDate(certificate.date) ||
+                    formatDate(certificate.createdAt);
+                const credentialUrl = getText(certificate.credentialUrl);
+                const description = getText(certificate.description);
+                const meta = [issuer, issuedDate].filter(Boolean).join(" | ");
+                addItemTitle(doc, title, meta);
+                if (description) {
+                    addBullet(doc, description);
+                }
+                if (credentialUrl) {
+                    addBullet(doc, `Credential: ${credentialUrl}`);
+                }
+                doc.moveDown(0.35);
+            });
+        }
+        // Cyber labs
+        if (cyberLabs.length > 0) {
+            addSectionTitle(doc, "Cybersecurity Labs");
+            cyberLabs.slice(0, 10).forEach((lab) => {
+                const title = getText(lab.title) ||
+                    getText(lab.name) ||
+                    getText(lab.platform, "Cybersecurity Lab");
+                const platform = getText(lab.platform);
+                const status = getText(lab.status);
+                const description = getText(lab.description);
+                const url = getText(lab.url) || getText(lab.profileUrl);
+                const meta = [platform, status].filter(Boolean).join(" | ");
+                addItemTitle(doc, title, meta);
+                if (description) {
+                    addBullet(doc, description);
+                }
+                if (url) {
+                    addBullet(doc, `Link: ${url}`);
+                }
+                doc.moveDown(0.35);
+            });
+        }
+        // Footer
+        addPageIfNeeded(doc, 60);
+        doc.moveDown(1);
+        doc
+            .font("Helvetica")
+            .fontSize(8.5)
+            .fillColor("#6b7280")
+            .text("This ATS-friendly CV was generated automatically from the live portfolio content.", {
+            align: "center",
+        });
+        doc.end();
+    }
+    catch (error) {
+        console.error("CV generation failed");
+        console.error(error);
+        return res.status(500).json({
+            message: "Failed to generate CV.",
+        });
+    }
+}
