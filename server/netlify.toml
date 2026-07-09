@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "echo Backend API ready for Netlify"
   publish = "public"
   functions = "netlify/functions"
 
