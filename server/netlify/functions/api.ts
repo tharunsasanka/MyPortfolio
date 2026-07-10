@@ -3,7 +3,9 @@ import mongoose from "mongoose";
 import app from "../../src/app";
 import { connectDatabase } from "../../src/config/db";
 
-const serverlessHandler = serverless(app);
+const serverlessHandler = serverless(app, {
+  binary: ["application/pdf", "application/octet-stream"],
+});
 
 let connectionPromise: Promise<void> | null = null;
 
