@@ -15,9 +15,7 @@ function getText(value: unknown, fallback = "") {
 
 function getStringList(value: unknown) {
   if (Array.isArray(value)) {
-    return value
-      .map((item) => String(item).trim())
-      .filter(Boolean);
+    return value.map((item) => String(item).trim()).filter(Boolean);
   }
 
   if (typeof value === "string") {
@@ -60,14 +58,12 @@ function addPageIfNeeded(doc: PDFKit.PDFDocument, neededSpace = 90) {
 function addSectionTitle(doc: PDFKit.PDFDocument, title: string) {
   addPageIfNeeded(doc, 80);
 
-  doc.moveDown(0.9);
   doc
+    .moveDown(0.9)
     .font("Helvetica-Bold")
     .fontSize(12)
     .fillColor("#111827")
-    .text(title.toUpperCase(), {
-      continued: false,
-    });
+    .text(title.toUpperCase());
 
   doc
     .moveTo(50, doc.y + 4)
@@ -80,6 +76,8 @@ function addSectionTitle(doc: PDFKit.PDFDocument, title: string) {
 }
 
 function addBullet(doc: PDFKit.PDFDocument, text: string) {
+  if (!text) return;
+
   addPageIfNeeded(doc, 45);
 
   doc
@@ -110,17 +108,37 @@ function addParagraph(doc: PDFKit.PDFDocument, text: string) {
 function addItemTitle(doc: PDFKit.PDFDocument, title: string, meta?: string) {
   addPageIfNeeded(doc, 60);
 
-  doc.font("Helvetica-Bold").fontSize(10.8).fillColor("#111827").text(title, {
-    continued: Boolean(meta),
-  });
+  doc
+    .font("Helvetica-Bold")
+    .fontSize(10.8)
+    .fillColor("#111827")
+    .text(title, {
+      continued: Boolean(meta),
+    });
 
   if (meta) {
-    doc
-      .font("Helvetica")
-      .fontSize(10)
-      .fillColor("#4b5563")
-      .text(`  |  ${meta}`);
+    doc.font("Helvetica").fontSize(10).fillColor("#4b5563").text(`  |  ${meta}`);
   }
+}
+
+async function createPdfBuffer(doc: PDFKit.PDFDocument) {
+  const chunks: Buffer[] = [];
+
+  const pdfBufferPromise = new Promise<Buffer>((resolve, reject) => {
+    doc.on("data", (chunk) => {
+      chunks.push(Buffer.from(chunk));
+    });
+
+    doc.on("end", () => {
+      resolve(Buffer.concat(chunks));
+    });
+
+    doc.on("error", reject);
+  });
+
+  doc.end();
+
+  return pdfBufferPromise;
 }
 
 export async function downloadCv(_req: Request, res: Response) {
@@ -128,7 +146,7 @@ export async function downloadCv(_req: Request, res: Response) {
     const [profile, projects, skills, certificates, cyberLabs] =
       await Promise.all([
         Profile.findOne().sort({ updatedAt: -1 }).lean<AnyRecord>(),
-        Project.find().sort({ createdAt: -1 }).lean<AnyRecord[]>(),
+        Project.find().sort({ order: 1, createdAt: -1 }).lean<AnyRecord[]>(),
         Skill.find().sort({ category: 1, level: -1 }).lean<AnyRecord[]>(),
         Certificate.find().sort({ createdAt: -1 }).lean<AnyRecord[]>(),
         CyberLab.find().sort({ createdAt: -1 }).lean<AnyRecord[]>(),
@@ -156,9 +174,6 @@ export async function downloadCv(_req: Request, res: Response) {
 
     const fileName = `${safeFileName(name)}_ATS_CV.pdf`;
 
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
-
     const doc = new PDFDocument({
       size: "A4",
       margin: 50,
@@ -169,9 +184,6 @@ export async function downloadCv(_req: Request, res: Response) {
       },
     });
 
-    doc.pipe(res);
-
-    // Header
     doc.font("Helvetica-Bold").fontSize(22).fillColor("#111827").text(name);
 
     doc.moveDown(0.25);
@@ -192,9 +204,6 @@ export async function downloadCv(_req: Request, res: Response) {
         });
     }
 
-    doc.moveDown(0.8);
-
-    // Summary
     addSectionTitle(doc, "Professional Summary");
     addParagraph(doc, summary);
 
@@ -210,23 +219,25 @@ export async function downloadCv(_req: Request, res: Response) {
       addBullet(doc, `Technology focus: ${techStackText}`);
     }
 
-    // Skills
     if (skills.length > 0) {
       addSectionTitle(doc, "Technical Skills");
 
-      const groupedSkills = skills.reduce<Record<string, string[]>>((acc, skill) => {
-        const category = getText(skill.category, "General");
-        const skillName = getText(skill.name);
+      const groupedSkills = skills.reduce<Record<string, string[]>>(
+        (acc, skill) => {
+          const category = getText(skill.category, "General");
+          const skillName = getText(skill.name);
 
-        if (!skillName) return acc;
+          if (!skillName) return acc;
 
-        if (!acc[category]) {
-          acc[category] = [];
-        }
+          if (!acc[category]) {
+            acc[category] = [];
+          }
 
-        acc[category].push(skillName);
-        return acc;
-      }, {});
+          acc[category].push(skillName);
+          return acc;
+        },
+        {}
+      );
 
       Object.entries(groupedSkills).forEach(([category, names]) => {
         addPageIfNeeded(doc, 45);
@@ -250,7 +261,6 @@ export async function downloadCv(_req: Request, res: Response) {
       });
     }
 
-    // Projects
     if (projects.length > 0) {
       addSectionTitle(doc, "Selected Projects");
 
@@ -284,7 +294,6 @@ export async function downloadCv(_req: Request, res: Response) {
       });
     }
 
-    // Certificates
     if (certificates.length > 0) {
       addSectionTitle(doc, "Certificates");
 
@@ -314,7 +323,6 @@ export async function downloadCv(_req: Request, res: Response) {
       });
     }
 
-    // Cyber labs
     if (cyberLabs.length > 0) {
       addSectionTitle(doc, "Cybersecurity Labs");
 
@@ -345,11 +353,10 @@ export async function downloadCv(_req: Request, res: Response) {
       });
     }
 
-    // Footer
     addPageIfNeeded(doc, 60);
 
-    doc.moveDown(1);
     doc
+      .moveDown(1)
       .font("Helvetica")
       .fontSize(8.5)
       .fillColor("#6b7280")
@@ -360,7 +367,13 @@ export async function downloadCv(_req: Request, res: Response) {
         }
       );
 
-    doc.end();
+    const pdfBuffer = await createPdfBuffer(doc);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+    res.setHeader("Content-Length", String(pdfBuffer.length));
+
+    return res.status(200).send(pdfBuffer);
   } catch (error) {
     console.error("CV generation failed");
     console.error(error);
