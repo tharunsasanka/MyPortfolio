@@ -19,8 +19,8 @@ const contactInfo = [
   {
     icon: HiEnvelope,
     label: "Email",
-    value: "tharunsasanka1234@gmail.com",
-    href: "mailto:tharunsasanka1234@gmail.com",
+    value: "tharunsasanka0@gmail.com",
+    href: "mailto:tharunsasanka0@gmail.com",
   },
   {
     icon: HiPhone,
